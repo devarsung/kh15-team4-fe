@@ -1,0 +1,13 @@
+.logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 30px;
+    letter-spacing: 0px;
+  }
+  
+  .logo-text {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  

@@ -1,32 +1,48 @@
 import { useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import './App.css'
-import Welcome from './components/Welcome'
-import Login from './components/Login'
+import { ToastContainer, Bounce } from 'react-toastify';
+import Intro from './pages/Intro'
+import Login from './pages/Login'
+import Join from './pages/Join'
 import Board from './components/Board'
-import MyHome from './components/MyHome'
+import MyHome from './pages/MyHome'
+import MainLayout from './layouts/MainLayout'
+import EmptyLayout from './layouts/EmptyLayout'
 
 function App() {
-  
 
   return (<>
 
-      {/*  */}
+    <Routes>
 
-      {/* 컨테이너 */}
-      <div className="container mt-5 pt-5" style={{minHeight: "350px"}}>
-      
-        <Routes>
-          <Route path="/" element={<Welcome/>}></Route>
-          <Route path="/login" element={<Login/>}></Route>
-          <Route path="/board/:boardNo" element={<Board/>}></Route>
-          <Route path="/myhome" element={<MyHome/>}></Route>
-        </Routes>
-
-      </div>
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Intro />} />
+        <Route path="/board/:boardNo" element={<Board />} />
+        <Route path="/myhome" element={<MyHome />} />
+      </Route>
 
 
-    </>)
+      <Route element={<EmptyLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/join" element={<Join />} />
+      </Route>
+    </Routes>
+
+    <ToastContainer
+      position="bottom-center"
+      autoClose={3000}
+      hideProgressBar
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      pauseOnHover
+      theme="colored"
+      transition={Bounce}
+    />
+
+  </>)
 }
 
 export default App
