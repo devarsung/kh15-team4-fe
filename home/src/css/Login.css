@@ -29,6 +29,7 @@
   background-color: #f8f9fa !important;
 }
 
+/* 인풋창 끝 아이콘 영역 */
 .input-group-text {
   cursor: pointer;
   background-color: white !important;
@@ -53,8 +54,7 @@
   font-size: 14px;
 }
 
-
-/* 스피너 */
+/* 스피너, 이메일 전송중일시 */
 .fa-spin {
   animation: spin 1s linear infinite;
 }
@@ -66,4 +66,18 @@
   to {
       transform:rotate(360deg);
   }
+}
+
+/* 회원가입 비밀번호 검사 블록 */
+.pw-safe-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+}
+
+.pw-safe-box {
+  display: inline-block;
+  width: 33%;
+  height: 5px;
 }

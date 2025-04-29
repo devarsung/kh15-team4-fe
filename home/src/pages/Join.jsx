@@ -13,13 +13,14 @@ export default function Join() {
     //state
     const [step, setStep] = useState(1);
 
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState("");//email input
 
-    const [certNumber, setCertNumber] = useState("");
-    const [certSending, setCertSending] = useState(false);
+    const [certNumber, setCertNumber] = useState("");//인증번호 input
+    const [certSending, setCertSending] = useState(false);//발송중 여부
 
-    const [pw, setPw] = useState("");
+    const [pw, setPw] = useState("");//pw input
     const [pwVisible, setPwVisible] = useState(false);
+    const [pwSafe, setPwSafe] = useState(0);
 
     //callback
 
@@ -70,7 +71,6 @@ export default function Join() {
             toast.warning("숫자만 입력해주세요");
             return;
         }
-
         setCertNumber(e.target.value);//설정
     }, [certNumber]);
 
@@ -86,7 +86,7 @@ export default function Join() {
                 certEmail: email,
                 certNumber: certNumber
             });
-            //Plan A: 인증성공(해피엔딩)
+            //Plan A: 인증성공
             setStep(3);
         }
         catch (e) {
@@ -95,8 +95,49 @@ export default function Join() {
         }
     }, [email, certNumber]);
 
+    //비밀번호 형식, 안전도 검사
+    const checkPwFormat = useCallback((value)=>{
+        if(value.length < 8 || value.length > 16) {
+            setPwSafe(0);
+            return;
+        }
+
+        if(value.length >= 8) {
+            setPwSafe(1);
+            if(/[A-Z]+/.test(value) && /[a-z]+/.test(value) && /[0-9]+/.test(value)) {
+                setPwSafe(2);
+                if(/[!@#$]+/.test(value)) {
+                    setPwSafe(3);
+                }
+            }
+        }
+    },[]);
+
+    //비밀번호 안전도 클래스
+    const pwSafeClass = useMemo(()=>{
+        switch(pwSafe) {
+            case 1: return "bg-danger";
+            case 2: return "bg-warning";
+            case 3: return "bg-primary";
+            default: return "bg-light";
+        }
+    },[pwSafe]);
+
+    //계정 생성 요청
+    const join = useCallback(async ()=>{
+        if(pwSafe < 3) {
+            toast.warning("비밀번호는 대소문자,숫자,특수문자 포함 8~16자로 설정해주세요");
+            return;
+        }
+
+        const account = {accountEmail: email, accountPw: pw};
+        await axios.post("/account/", account);
+        navigate("/");
+    },[email, pw, pwSafe]);
+
     return (<>
 
+        {/* 테스트용 */}
         <div className="mt-3">
             <button onClick={() => setStep(1)}>1</button>
             <button onClick={() => setStep(2)}>2</button>
@@ -114,7 +155,7 @@ export default function Join() {
 
                             <div className="mb-3">
                                 <input type="email" className="form-control" placeholder="이메일을 입력하세요"
-                                    value={email} onChange={e => setEmail(e.target.value)} disabled={certSending} />
+                                    value={email} onChange={e=>setEmail(e.target.value)} disabled={certSending} />
                                 <div className="invalid-feedback text-start">이메일 형식에 맞지 않습니다</div>
                             </div>
 
@@ -159,17 +200,23 @@ export default function Join() {
                                 <label htmlFor="" className="form-label label-text">비밀번호</label>
                                 <div className="input-group has-validation">
                                     <input type={pwVisible === true ? "text" : "password"} className="form-control" placeholder="비밀번호 만들기"
-                                        value={pw} onChange={e=>setPw(e.target.value)} />
-                                    <span className="input-group-text" onClick={() => setPwVisible(!pwVisible)}>
+                                        value={pw} onChange={e=>{setPw(e.target.value); checkPwFormat(e.target.value);}} />
+                                    <span className="input-group-text" onClick={()=>setPwVisible(!pwVisible)}>
                                         {pwVisible === true ? <IoEyeSharp /> : <IoEyeOutline />}
                                     </span>
                                     <div className="invalid-feedback">비밀번호가 유효하지 않습니다</div>
                                 </div>
                             </div>
 
+                            <div className="pw-safe-wrapper mb-3">
+                                <span className={`pw-safe-box ${pwSafe>=1 ? pwSafeClass : "bg-light"}`}></span>
+                                <span className={`pw-safe-box ${pwSafe>=2 ? pwSafeClass : "bg-light"}`}></span>
+                                <span className={`pw-safe-box ${pwSafe>=3 ? pwSafeClass : "bg-light"}`}></span>
+                            </div>
+
                             <p className="mb-3 terms-text">가입하면 cloud 이용 약관에 동의하고 개인정보 보호정책을 인정한 것으로 간주됩니다.</p>
 
-                            <button type="submit" className="btn btn-primary w-100 mb-3">확인</button>
+                            <button type="submit" className="btn btn-primary w-100 mb-3" onClick={join}>확인</button>
                         </div>
                     )}
 
