@@ -44,7 +44,7 @@ export default function Join() {
     const checkEmailExist = useCallback(async () => {
         const { data } = await axios.get(`/account/accountEmail/${email}`);
         if (data === true) {//존재하는 이메일이면(이미 회원)
-            navigate("/login", { state: { email: email } });
+            navigate("/login", { state: { hasAccount: true, email: email } });
         }
         else {
             sendCertMail();
