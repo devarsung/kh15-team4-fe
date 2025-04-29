@@ -7,11 +7,17 @@ import { PiDot } from "react-icons/pi";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../components/template/Logo';
 import { toast } from "react-toastify";
+import { useRecoilState } from "recoil";
+import { userNoState, userEmailState } from "../utils/storage";
 
 export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
-    
+
+    //recoil
+    const [userNo, setUserNo] = useRecoilState(userNoState);
+    const [userEmail, setUserEmail] = useRecoilState(userEmailState);
+
     //state
     const [hasAccount, setHasAccount] = useState(false);
     const [email, setEmail] = useState("");
@@ -51,20 +57,27 @@ export default function Login() {
         }
     }, [email]);
 
+    //이메일 재입력하기
     const editEmail = useCallback(()=>{
         setEmailPass(false);
         setPwVisible(false);
         setPw("");
     },[]);
 
+    //로그인 요청
     const loginRequest = useCallback(async() => {
         if(pw.length <= 0) {
             toast.warning("비밀번호를 입력하세요");
             return;
         }
 
-        await axios.post("/account/login", {accountEmail: email, accountPw: pw});
-    }, [email, pw])
+        const {data} = await axios.post("/account/login", {accountEmail: email, accountPw: pw});
+        setUserNo(data.userNo);//recoil state에 저장
+        setUserEmail(data.userEmail);//recoil state에 저장
+        axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
+
+        navigate("/");
+    }, [email, pw]);
 
     return (<>
         <div className="login-wrapper">
