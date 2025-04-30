@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import './App.css'
 import { ToastContainer, Bounce } from 'react-toastify';
@@ -9,8 +9,13 @@ import Board from './components/Board'
 import MyHome from './pages/MyHome'
 import MainLayout from './layouts/MainLayout'
 import EmptyLayout from './layouts/EmptyLayout'
+import { useSign } from "./hooks/useSign";
 
 function App() {
+  const {refreshLogin} = useSign();
+  useEffect(()=>{
+    refreshLogin();
+  },[]);
 
   return (<>
 

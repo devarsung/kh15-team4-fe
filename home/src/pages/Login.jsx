@@ -7,16 +7,12 @@ import { PiDot } from "react-icons/pi";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../components/template/Logo';
 import { toast } from "react-toastify";
-import { useRecoilState } from "recoil";
-import { userNoState, userEmailState } from "../utils/storage";
+import { useSign } from "../hooks/useSign";
 
 export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
-
-    //recoil
-    const [userNo, setUserNo] = useRecoilState(userNoState);
-    const [userEmail, setUserEmail] = useRecoilState(userEmailState);
+    const {loginRequest} = useSign();
 
     //state
     const [hasAccount, setHasAccount] = useState(false);
@@ -24,6 +20,8 @@ export default function Login() {
     const [emailPass, setEmailPass] = useState(false);
     const [pw, setPw] = useState("");
     const [pwVisible, setPwVisible] = useState(false);
+
+    const [stay, setStay] = useState(false);//로그인 유지
 
     useEffect(() => {
         setHasAccount(location.state?.hasAccount || false);
@@ -58,26 +56,22 @@ export default function Login() {
     }, [email]);
 
     //이메일 재입력하기
-    const editEmail = useCallback(()=>{
+    const editEmail = useCallback(() => {
         setEmailPass(false);
         setPwVisible(false);
         setPw("");
-    },[]);
+    }, []);
 
-    //로그인 요청
-    const loginRequest = useCallback(async() => {
-        if(pw.length <= 0) {
+    //로그인 핸들러
+    const handleLogin = useCallback(async () => {
+        if (pw.length <= 0) {
             toast.warning("비밀번호를 입력하세요");
             return;
         }
 
-        const {data} = await axios.post("/account/login", {accountEmail: email, accountPw: pw});
-        setUserNo(data.userNo);//recoil state에 저장
-        setUserEmail(data.userEmail);//recoil state에 저장
-        axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
-
-        navigate("/");
-    }, [email, pw]);
+        //로그인 요청
+        loginRequest(email, pw, stay);
+    }, [email, pw, stay]);
 
     return (<>
         <div className="login-wrapper">
@@ -95,16 +89,16 @@ export default function Login() {
                         <div className="mb-3">
                             <div className="input-group has-validation">
                                 <input type="email" className="form-control" placeholder="이메일을 입력하세요"
-                                    value={email} onChange={e=>setEmail(e.target.value)} onClick={editEmail}/>
+                                    value={email} onChange={e => setEmail(e.target.value)} onClick={editEmail} />
                                 {emailPass === true && (
-                                    <span className="input-group-text" role="button" tabIndex={0} 
-                                        onClick={editEmail} 
-                                        onKeyDown={e=>{
+                                    <span className="input-group-text" role="button" tabIndex={0}
+                                        onClick={editEmail}
+                                        onKeyDown={e => {
                                             if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            editEmail();
+                                                e.preventDefault();
+                                                editEmail();
                                             }
-                                    }}>
+                                        }}>
                                         <FaPen />
                                     </span>
                                 )}
@@ -114,24 +108,35 @@ export default function Login() {
                         {emailPass === true && (
                             <div className="mb-3">
                                 <div className="input-group">
-                                    <input type={pwVisible === true ? "text" : "password"} className="form-control" placeholder="비밀번호를 입력하세요" 
-                                        value={pw} onChange={e=>setPw(e.target.value)}/>
-                                    <span className="input-group-text" role="button" tabIndex={0} 
-                                        onClick={()=>setPwVisible(!pwVisible)} 
-                                        onKeyDown={e=>{
+                                    <input type={pwVisible === true ? "text" : "password"} className="form-control" placeholder="비밀번호를 입력하세요"
+                                        value={pw} onChange={e => setPw(e.target.value)} />
+                                    <span className="input-group-text" role="button" tabIndex={0}
+                                        onClick={() => setPwVisible(!pwVisible)}
+                                        onKeyDown={e => {
                                             if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            setPwVisible(!pwVisible);
-                                        }
-                                    }}>
+                                                e.preventDefault();
+                                                setPwVisible(!pwVisible);
+                                            }
+                                        }}>
                                         {pwVisible === true ? <IoEyeSharp /> : <IoEyeOutline />}
                                     </span>
                                 </div>
                             </div>
                         )}
 
+                        {/* 로그인 유지 체크박스 */}
+                        <div className="mb-3 text-start">
+                            <div className="form-check">
+                                <input className="form-check-input" type="checkbox" id="flexCheckDefault"
+                                    checked={stay} onChange={e => setStay(e.target.checked)} />
+                                <label className="form-check-label" htmlFor="flexCheckDefault">
+                                    로그인 유지
+                                </label>
+                            </div>
+                        </div>
+
                         {emailPass === true ? (
-                            <button type="submit" className="btn btn-primary w-100 mb-3" onClick={loginRequest}>로그인</button>
+                            <button type="submit" className="btn btn-primary w-100 mb-3" onClick={handleLogin}>로그인</button>
                         ) : (
                             <button type="submit" className="btn btn-primary w-100 mb-3" onClick={checkEmailFormat}>계속</button>
                         )}
