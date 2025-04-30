@@ -1,12 +1,13 @@
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
-import { userNoState, userEmailState, loginState } from "../utils/storage";
+import { userNoState, userEmailState, loginState, userLoadingState } from "../utils/storage";
 import axios from "axios";
 
 export const useSign = () => {
     const isLogin = useRecoilValue(loginState);
     const [userNo, setUserNo] = useRecoilState(userNoState);
     const [userEmail, setUserEmail] = useRecoilState(userEmailState);
+    const [userLoading, setUserLoading] = useRecoilState(userLoadingState);
     const navigate = useNavigate();
 
     const loginRequest = async (email, pw, stay) => {
@@ -60,6 +61,7 @@ export const useSign = () => {
         if(refreshToken === null) {
             refreshToken = window.localStorage.getItem("refreshToken");
             if(refreshToken === null) {
+                setUserLoading(true);
                 return;
             }
             else {
@@ -83,8 +85,12 @@ export const useSign = () => {
                 window.localStorage.removeItem("refreshToken");
                 window.sessionStorage.setItem("refreshToken", data.refreshToken);
             }
+
+            setUserLoading(true);
         }
-        catch(e) {}
+        catch(e) {
+            setUserLoading(true);
+        }
     }
 
     return { loginRequest, logoutRequest, refreshLogin };

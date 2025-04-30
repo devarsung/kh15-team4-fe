@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 
-export default function MyHome(){
+export default function MyPage(){
     const navigate = useNavigate();
 
     const [title, setTitle] = useState("");

@@ -42,17 +42,19 @@ export default function TopMenu() {
                             </Link>
                         </li>
                         <li className="nav-item">
+                            <Link to="/myPage" className="nav-link">
+                                mypage
+                            </Link>
+                        </li>
+                        <li className="nav-item">
                             <Link className="nav-link" onClick={quickLogin}>
                                 빠른로그인
                             </Link>
                         </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="#">About</a>
-                        </li>
                         <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#">Action</a>
+                                <a className="dropdown-item" href="#">About</a>
                                 <a className="dropdown-item" href="#">Pricing</a>
                                 <a className="dropdown-item" href="#">Something else here</a>
                                 <div className="dropdown-divider"></div>

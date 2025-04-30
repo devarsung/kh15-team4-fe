@@ -6,10 +6,11 @@ import Intro from './pages/Intro'
 import Login from './pages/Login'
 import Join from './pages/Join'
 import Board from './components/Board'
-import MyHome from './pages/MyHome'
+import MyPage from './pages/MyPage'
 import MainLayout from './layouts/MainLayout'
 import EmptyLayout from './layouts/EmptyLayout'
 import { useSign } from "./hooks/useSign";
+import Private from './utils/Private';
 
 function App() {
   const {refreshLogin} = useSign();
@@ -23,14 +24,14 @@ function App() {
 
       <Route element={<MainLayout />}>
         <Route path="/" element={<Intro />} />
-        <Route path="/board/:boardNo" element={<Board />} />
-        <Route path="/myhome" element={<MyHome />} />
+        <Route path="/board/:boardNo" element={<Board/>} />
+        <Route path="/myPage" element={<Private><MyPage/></Private>} />
       </Route>
 
 
       <Route element={<EmptyLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/join" element={<Join />} />
+        <Route path="/login" element={<Login/>} />
+        <Route path="/join" element={<Join/>} />
       </Route>
     </Routes>
 

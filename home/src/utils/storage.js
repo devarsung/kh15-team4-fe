@@ -10,6 +10,11 @@ const userEmailState = atom({
     default: null
 });
 
+const userLoadingState = atom({
+    key: "userLoadingState",
+    default: false
+});
+
 const loginState = selector({
     key: "loginState",
     get: (state)=>{
@@ -17,6 +22,6 @@ const loginState = selector({
         const userEmail = state.get(userEmailState);
         return userNo !== null && userEmail !== null;
     }
-})
+});
 
-export {userNoState, userEmailState, loginState}
+export {userNoState, userEmailState, userLoadingState, loginState}
