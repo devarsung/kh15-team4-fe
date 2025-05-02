@@ -24,14 +24,14 @@ function App() {
 
       <Route element={<MainLayout />}>
         <Route path="/" element={<Intro />} />
-        <Route path="/board/:boardNo" element={<Board/>} />
+        <Route path="/login" element={<Login/>} />
+        <Route path="/join" element={<Join/>} />
+        <Route path="/board/:boardNo" element={<Private><Board/></Private>} />
         <Route path="/myPage" element={<Private><MyPage/></Private>} />
       </Route>
 
-
       <Route element={<EmptyLayout />}>
-        <Route path="/login" element={<Login/>} />
-        <Route path="/join" element={<Join/>} />
+        
       </Route>
     </Routes>
 

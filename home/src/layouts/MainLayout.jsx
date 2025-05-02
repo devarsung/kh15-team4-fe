@@ -11,6 +11,6 @@ export default function MainLayout(){
         <div className="container mt-5 pt-5" style={{minHeight: "350px"}}>
             <Outlet/>
         </div>
-        <hr />
+        
     </>)
 }
