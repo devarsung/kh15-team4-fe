@@ -15,7 +15,7 @@ export default function LaneWrapper(props) {
     }, []);
     
     const sortableItems = useMemo(() => {
-        return laneList.map(lane => lane.laneNo);
+        return laneList.map(lane => "lane"+lane.laneNo);
     }, [laneList]);
 
     const createLane = useCallback(async () => {
@@ -30,23 +30,33 @@ export default function LaneWrapper(props) {
 
     const handleDragEnd = useCallback(event => {
         const { active, over } = event;
-        if (!over || active.id === over.id) return;
+        const type = active.data.current.type;
 
-        const oldIndex = laneList.findIndex(item => item.laneNo === active.id);
-        const newIndex = laneList.findIndex(item => item.laneNo === over.id);
+        if(type === "lane") {
+            if (!over || active.id === over.id) return;
 
-        const prevLaneList = [...laneList];
-        const movedArray = arrayMove(laneList, oldIndex, newIndex).map((item, index) => ({
-            ...item,
-            laneOrder: index + 1
-        }));
-        setLaneList(movedArray);
-        const orderDataList = movedArray.map(item => ({
-            laneNo: item.laneNo,
-            laneOrder: item.laneOrder
-        }));
+            const oldIndex = laneList.findIndex(item => item.laneNo === active.data.current.no);
+            const newIndex = laneList.findIndex(item => item.laneNo === over.data.current.no);
+    
+            if(oldIndex === -1 || newIndex === -1) return;
+    
+            const prevLaneList = [...laneList];
+            const movedArray = arrayMove(laneList, oldIndex, newIndex).map((item, index) => ({
+                ...item,
+                laneOrder: index + 1
+            }));
+            setLaneList(movedArray);
+            const orderDataList = movedArray.map(item => ({
+                laneNo: item.laneNo,
+                laneOrder: item.laneOrder
+            }));
+    
+            laneOrderUpdate(orderDataList, prevLaneList);
+        }
+        else if(type === "card") {
+            
+        }
 
-        laneOrderUpdate(orderDataList, prevLaneList);
     }, [laneList]);
 
     const laneOrderUpdate = useCallback(async (orderDataList, prevLaneList)=>{
@@ -69,8 +79,8 @@ export default function LaneWrapper(props) {
         <div className="lane-wrapper mt-4">
             <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
                 <SortableContext items={sortableItems} strategy={horizontalListSortingStrategy}>
-                    {laneList.map(lane => (
-                        <Lane key={lane.laneNo} lane={lane} loadLaneList={loadLaneList}></Lane>
+                    {laneList.map((lane,index) => (
+                        <Lane key={lane.laneNo} id={sortableItems[index]} lane={lane} loadLaneList={loadLaneList}></Lane>
                     ))}
                 </SortableContext>
             </DndContext>
