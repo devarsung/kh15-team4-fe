@@ -1,45 +1,49 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
+import { rectSortingStrategy, SortableContext, arrayMove } from "@dnd-kit/sortable";
+import React from "react";
 import { useEffect, useState } from "react";
 import LaneHeader from "./LaneHeader";
-import CardWrapper from "./CardWrapper";
+import "../css/Lane.css";
+import Card from "./Card";
 
-export default function Lane(props) {
-    const {id, lane, loadLaneList} = props;
+export default React.memo(function Lane(props) {
+    const { id, lane, loadLaneWithCardsList, cardsInLaneMap } = props;
 
-    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } = useSortable({
+    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
             type: "lane",
-            no: lane.laneNo
+            laneNo: lane.laneNo
         }
     });
 
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-    }
+        opacity: isDragging ? 0.5 : 1
+    };
 
-    useEffect(()=>{
-        //console.log("Lane mounted", lane);
-    },[]);
-
-    const [cardList, setCardList] = useState({
-        1: [{cardNo: 1, cardTitle: "card1", cardOrder: 1},{cardNo: 2, cardTitle: "card2", cardOrder: 2}],
-        2: [{cardNo: 3, cardTitle: "card3", cardOrder: 1},{cardNo: 4, cardTitle: "card4", cardOrder: 2}],
-        3: [{cardNo: 5, cardTitle: "card5", cardOrder: 1},{cardNo: 6, cardTitle: "card6", cardOrder: 2}]
-    });
+    useEffect(() => {
+    }, []);
 
     return (<>
         <div className="lane" ref={setNodeRef} style={style}>
             <LaneHeader setActivatorNodeRef={setActivatorNodeRef} listeners={listeners} attributes={attributes}
-                laneNo={lane.laneNo} loadLaneList={loadLaneList}>
+                laneNo={lane.laneNo} loadLaneWithCardsList={loadLaneWithCardsList}>
                 <h5>[{lane.laneNo}] {lane.laneTitle}</h5>
             </LaneHeader>
-            
+
             <p>order: {lane.laneOrder}</p>
 
-            <CardWrapper cardList={cardList[lane.laneNo]}></CardWrapper>
+            <div className="card-area">
+                <SortableContext items={lane.cardIds} strategy={rectSortingStrategy}>
+                    {lane.cardIds.map(cardId=>(
+                        <Card key={cardId} id={cardId} card={cardsInLaneMap[cardId]} laneId={id}></Card>
+                    ))}
+                </SortableContext>
+            </div>
+
         </div>
     </>)
-}
+});

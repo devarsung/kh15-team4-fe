@@ -1,3 +1,16 @@
 .board {
     
 }
+
+/* .lane-area {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+} */
+
+.lane-area {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;  /* ✅ 레인끼리 높이 강제 안 함 */
+  }
+  

@@ -1,17 +1,28 @@
-.lane-wrapper {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-}
-
-.lane {
+/* .lane {
     width: 200px;
-    
     max-width: 500px;
     background-color: #f2f2f3;
     border-radius: 5px;
     padding: 15px;
     display: flex;
     flex-direction: column;
-    
+} */
+
+.lane {
+    width: 200px;
+    max-width: 500px;
+    background-color: #f2f2f3;
+    border-radius: 5px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+    align-items: stretch;
+  }
+  
+
+.card-area {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }

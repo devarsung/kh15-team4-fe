@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 export default function LaneHeader(props) {
-    const { setActivatorNodeRef, listeners, attributes, children, laneNo, loadLaneList } = props;
+    const { setActivatorNodeRef, listeners, attributes, children, laneNo, loadLaneWithCardsList } = props;
 
     const editLaneTitle = useCallback(async()=>{
 
@@ -12,7 +12,7 @@ export default function LaneHeader(props) {
     const deleteLane = useCallback(async()=>{
         try {
             await axios.delete(`/lane/${laneNo}`);
-            loadLaneList();
+            loadLaneWithCardsList();
         }
         catch(e){}
         
