@@ -8,7 +8,7 @@ import "../css/Lane.css";
 import Card from "./Card";
 
 export default React.memo(function Lane(props) {
-    const { id, lane, loadLaneWithCardsList, cardsInLaneMap } = props;
+    const { id, lane } = props;
 
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
@@ -30,16 +30,16 @@ export default React.memo(function Lane(props) {
     return (<>
         <div className="lane" ref={setNodeRef} style={style}>
             <LaneHeader setActivatorNodeRef={setActivatorNodeRef} listeners={listeners} attributes={attributes}
-                laneNo={lane.laneNo} loadLaneWithCardsList={loadLaneWithCardsList}>
+                laneNo={lane.laneNo}>
                 <h5>[{lane.laneNo}] {lane.laneTitle}</h5>
             </LaneHeader>
 
             <p>order: {lane.laneOrder}</p>
 
             <div className="card-area">
-                <SortableContext items={lane.cardIds} strategy={rectSortingStrategy}>
-                    {lane.cardIds.map(cardId=>(
-                        <Card key={cardId} id={cardId} card={cardsInLaneMap[cardId]} laneId={id}></Card>
+                <SortableContext items={lane.cardList.map(card => `card${card.cardNo}`)} strategy={rectSortingStrategy}>
+                    {lane.cardList.map(card => (
+                        <Card key={`card${card.cardNo}`} id={`card${card.cardNo}`} card={card} laneNo={lane.laneNo} laneId={id}></Card>
                     ))}
                 </SortableContext>
             </div>

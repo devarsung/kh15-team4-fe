@@ -4,13 +4,18 @@ import { CSS } from "@dnd-kit/utilities"
 import "../css/Card.css";
 
 export default React.memo(function Card(props) {
-    const { id, card, laneId } = props;
+    const { id, card, laneNo, laneId } = props;
+
+    if (!card) {
+        return null; // 혹은 에러 메시지 등
+    }
+
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
             type: "card",
-            cardNo: card?.cardNo,
-            laneNo: card?.laneNo,
+            cardNo: card.cardNo,
+            laneNo: laneNo,
             laneId: laneId
         }
     });

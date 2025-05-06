@@ -3,5 +3,9 @@ export const removeAtIndex = (array, index) => {
 };
 
 export const insertAtIndex = (array, index, item) => {
+    if(array.length === 0) {
+        return [...array, item];
+    }
+
     return [...array.slice(0, index), item, ...array.slice(index)];
 };

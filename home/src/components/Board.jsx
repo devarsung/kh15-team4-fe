@@ -8,48 +8,23 @@ import "../css/Board.css";
 import Lane from "./Lane";
 import axios from "axios";
 import Card from "./Card";
+import { useKanban } from "../hooks/useKanban";
 import { removeAtIndex, insertAtIndex } from "../utils/array";
 
 export default function Board() {
+    const {createLane, loadLaneFullList, updateLaneOrder, moveBetweenLanes} = useKanban();
     const { boardNo } = useParams();
-
     const [title, setTitle] = useState("");
 
-    const [laneWithCardsList, setLaneWithCardsList] = useState([]);
-    const [laneMap, setLaneMap] = useState({});
-    const [cardMap, setCardMap] = useState({});
-    const [laneIds, setLaneIds] = useState([]);
+    const [laneFullList, setLaneFullList] = useState([]);
     const [activeDragInfo, setActiveDragInfo] = useState(null);
 
     useEffect(() => {
-        loadLaneWithCardsList();
-    }, []);
-
-    useEffect(() => {
-        normalizeBoardData();
-    }, [laneWithCardsList]);
-
-    const cardsInLane = useCallback((laneId) => {
-        const map = {};
-        laneMap[laneId].cardIds.forEach(cardId => {
-            map[cardId] = cardMap[cardId];
-        });
-        return map;
-    }, [laneMap, cardMap]);
-
-    const createLane = useCallback(async () => {
-        await axios.post(`/lane/${boardNo}`, { laneTitle: title });
-        loadLaneWithCardsList();
-    }, [title]);
-
-    // const loadLaneList = useCallback(async () => {
-    //     const { data } = await axios.get(`/lane/${boardNo}`);
-    //     setLaneList(data);
-    // }, []);
-
-    const loadLaneWithCardsList = useCallback(async () => {
-        const { data } = await axios.get(`/lane/lanewithcards/${boardNo}`);
-        setLaneWithCardsList(data);
+        const loadData = async()=>{
+            const data = await loadLaneFullList(boardNo);
+            setLaneFullList(data);
+        };
+        loadData();
     }, []);
 
     const handleDragEnd = useCallback(event => {
@@ -61,31 +36,35 @@ export default function Board() {
 
         const activeType = active.data.current.type;
         const overType = over.data.current.type;
-
-        console.log(active, over);
+        const prevLaneFullList = [...laneFullList];
 
         //레인 이동
         if (activeType === "lane") {
-            const oldIndex = laneIds.findIndex(item => item === active.id);
-            const newIndex = laneIds.findIndex(item => item === over.id);
+            const activeIndex = active.data.current.sortable.index;
+            const overIndex = over.data.current.sortable.index;
 
-            if (oldIndex === -1 || newIndex === -1) return;
+            if (activeIndex === -1 || overIndex === -1) return;
 
-            const prevLaneIds = [...laneIds];
-            const movedArray = arrayMove(laneIds, oldIndex, newIndex);
-            setLaneIds(movedArray);
+            const movedArray = arrayMove(laneFullList, activeIndex, overIndex);
+            setLaneFullList(movedArray);
             const orderDataList = movedArray.map((item, index) => ({
-                laneNo: laneMap[item].laneNo,
+                laneNo: item.laneNo,
                 laneOrder: index + 1
             }));
 
-            laneOrderUpdate(orderDataList, prevLaneIds);
+            try {
+                updateLaneOrder(orderDataList);
+            }
+            catch(e) {
+                setLaneFullList(prevLaneFullList);
+            }
+            
             return;
         }
 
         //카드 이동, activeType === "card"
-        const activeLane = active.data.current.laneId;
-        const overLane = over.data.current.laneId || over.id;
+        const activeLane = active.data.current.laneNo;
+        const overLane = over.data.current.laneNo;
         console.log("끝났을때 activeLane: ", activeLane, ", overLane: ", overLane);
 
         const activeIndex = active.data.current.sortable.index;
@@ -94,82 +73,66 @@ export default function Board() {
 
         //같은 레인 내
         if (activeLane === overLane) {
-            const movedArray = arrayMove(laneMap[activeLane].cardIds, activeIndex, overIndex);
-            setLaneMap(prev => ({
-                ...prev,
-                [activeLane]: {
-                    ...prev[activeLane],
-                    cardIds: movedArray
-                }
+            const cardList = laneFullList.find(item=>item.laneNo === activeLane).cardList;
+            const movedArray = arrayMove(cardList, activeIndex, overIndex);
+            setLaneFullList(
+                laneFullList.map(lane=>{
+                    if(lane.laneNo === activeLane) {
+                        return {
+                            ...lane,
+                            cardList: movedArray
+                        }
+                    }
+                    return lane;
+                })
+            );
+            const orderDataList = movedArray.map((item, index) => ({
+                cardNo: item.laneNo,
+                cardOrder: index + 1
             }));
-        }
-        else {
 
+            try {
+
+            }
+            catch(e) {
+                setLaneFullList(prevLaneFullList);
+            }
+        }
+        else {//다른 레인 간
+            
         }
 
         setTimeout(() => setActiveDragInfo(null), 0);
 
-    }, [laneIds, laneMap]);
-
-    const laneOrderUpdate = useCallback(async (orderDataList, prevLaneIds) => {
-        try {
-            await axios.put(`/lane/order`, orderDataList);
-        }
-        catch (e) {
-            setLaneIds(prevLaneIds);
-        }
-    }, []);
-
-    //정규화
-    const normalizeBoardData = useCallback(() => {
-        const lanes = {};
-        const cards = {};
-
-        laneWithCardsList.forEach(item => {
-            const laneDto = item.laneDto;
-            const cardList = item.cardList;
-
-            const { laneOrder, ...restData } = laneDto;
-            lanes[`lane${laneDto.laneNo}`] = {
-                ...restData,
-                cardIds: cardList.map(card => `card${card.cardNo}`)
-            };
-
-            cardList.forEach(card => {
-                const { cardOrder, ...restData } = card;
-                cards[`card${card.cardNo}`] = {
-                    ...restData
-                };
-            });
-        });
-
-        setLaneMap(lanes);
-        setCardMap(cards);
-        setLaneIds(Object.keys(lanes));
-    }, [laneWithCardsList]);
+    }, [laneFullList]);
 
     const handleDragStart = useCallback((event) => {
         const { active } = event;
         const type = active.data.current.type;
+        //console.log(active);
 
         if (type === "card") {
+            const laneNo = active.data.current.laneNo;
+            const cardNo = active.data.current.cardNo;
+            const card = laneFullList.find(lane=>lane.laneNo === laneNo).cardList.find(card=>card.cardNo === cardNo);
             setActiveDragInfo({
                 type: "card",
-                cardNo: active.data.current.cardNo,
-                cardId: active.id,
+                id: active.id,
+                card: card,
+                laneNo: laneNo,
                 laneId: active.data.current.laneId,
-                data: cardMap[active.id],
             });
         } else if (type === "lane") {
+            const laneNo = active.data.current.laneNo;
+            const lane = laneFullList.find(lane=>lane.laneNo === laneNo);
             setActiveDragInfo({
                 type: "lane",
-                laneId: active.id,
-                data: laneMap[active.id],
-                cardsInLane: cardsInLane(active.id)
+                id: active.id,
+                lane: lane
             });
         }
-    }, [cardMap, laneMap]);
 
+    }, [laneFullList]);
 
     const handleDragCancel = useCallback(() => {
         setActiveDragInfo(null);
@@ -177,22 +140,91 @@ export default function Board() {
 
     const handleDragOver = useCallback(throttle(event => {
         const { active, over } = event;
-        if (!over) return;
+        if (!over || active.id === over.id) return;
 
         const activeType = active.data.current.type;
+        const overType = over.data.current.type;
         if (activeType !== "card") return;
 
-        const activeLane = active.data.current.laneId;
-        const overLane = over.data.current.laneId || over.id;
-        if (activeLane === overLane) return;
+        const activeLaneNo = active.data.current.laneNo;
+        const overLaneNo = over.data.current.laneNo;
+        if (activeLaneNo === overLaneNo) return;
+        console.log(activeLaneNo, overLaneNo);
 
+        const prevLaneFullList = [...laneFullList];
+        const activeCardNo = active.data.current.cardNo;
 
-    }, 250), []);
+        const activeIndex = active.data.current.sortable.index;
+        const overIndex = over.data.current.sortable.index;
 
+        //다른 레인의 카드들 사이에 끼어들어감
+        if(activeType === overType) {
+            
+            setLaneFullList(prev=>{
+                const activeCardList = prev.find(lane=>lane.laneNo === activeLaneNo).cardList;
+                const overCardList = prev.find(lane=>lane.laneNo === overLaneNo).cardList;
+                const targetCard = activeCardList.find(card=>card.cardNo === activeCardNo);
+                const result = moveBetweenLanes(activeCardList, activeIndex, overCardList, overIndex, targetCard);
+                return prev.map(lane=>{
+                    if(lane.laneNo === activeLaneNo) {
+                        return {
+                            ...lane,
+                            cardList: result.before
+                        }
+                    }
+                    else if(lane.laneNo === overLaneNo) {
+                        return {
+                            ...lane,
+                            cardList: result.after
+                        }
+                    }
+                    return lane;
+                });
+            });
+            try {
 
-    const moveBetweenLanes = useCallback((items, activeLane, activeIndex, overLane, overIndex, item) => {
+            }
+            catch(e) {
+                console.log("에러");
+                setLaneFullList(prevLaneFullList);
+            }
+        }
+        else {//다른 빈 레인에 들어감
 
-    }, []);
+            setLaneFullList(prev=>{
+                const activeCardList = prev.find(lane=>lane.laneNo === activeLaneNo).cardList;
+                const overCardList = prev.find(lane=>lane.laneNo === overLaneNo).cardList;
+                const targetCard = activeCardList.find(card=>card.cardNo === activeCardNo);
+                const result = moveBetweenLanes(activeCardList, activeIndex, overCardList, 0, targetCard);
+                return prev.map(lane=>{
+                    if(lane.laneNo === activeLaneNo) {
+                        return {
+                            ...lane,
+                            cardList: result.before
+                        }
+                    }
+                    else if(lane.laneNo === overLaneNo) {
+                        return {
+                            ...lane,
+                            cardList: result.after
+                        }
+                    }
+                    return lane;
+                });
+            });
+
+            try {
+
+            }
+            catch(e) {
+                console.log("에러");
+                setLaneFullList(prevLaneFullList);
+            }
+        }
+
+    }, 350), [laneFullList]);
+
+    
     return (<>
         <BoardInfo boardNo={boardNo} />
 
@@ -208,27 +240,25 @@ export default function Board() {
                 onDragCancel={handleDragCancel}
                 onDragOver={handleDragOver}
                 collisionDetection={pointerWithin}>
-                <SortableContext items={laneIds} strategy={horizontalListSortingStrategy}>
-                    {laneIds.map(laneId => (
-                        <Lane key={laneId} id={laneId} lane={laneMap[laneId]}
-                            loadLaneWithCardsList={loadLaneWithCardsList}
-                            cardsInLaneMap={cardsInLane(laneId)}></Lane>
+                <SortableContext items={laneFullList.map(lane =>`lane${lane.laneNo}`)} strategy={horizontalListSortingStrategy}>
+                    {laneFullList.map(lane => (
+                        <Lane key={`lane${lane.laneNo}`} id={`lane${lane.laneNo}`} lane={lane}></Lane>
                     ))}
                 </SortableContext>
 
                 <DragOverlay>
                     {activeDragInfo?.type === "card" ? (
                         <Card
-                            id={activeDragInfo.cardId}
-                            card={activeDragInfo.data}
+                            id={activeDragInfo.id}
+                            card={activeDragInfo.card}
+                            laneNo={activeDragInfo.laneNo}
                             laneId={activeDragInfo.laneId}
                             dragOverlay
                         />
                     ) : activeDragInfo?.type === "lane" ? (
                         <Lane
-                            id={activeDragInfo.laneId}
-                            lane={activeDragInfo.data}
-                            cardsInLaneMap={activeDragInfo.cardsInLane}
+                            id={activeDragInfo.id}
+                            lane={activeDragInfo.lane}
                             dragOverlay
                         />
                     ) : null}
