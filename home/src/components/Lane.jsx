@@ -8,10 +8,11 @@ import "../css/Lane.css";
 import Card from "./Card";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
+import { useKanban } from "../hooks/useKanban";
 
 export default React.memo(function Lane(props) {
+    const { createCard } = useKanban();
     const { id, lane, cardMapInLane, loadData } = props;
-
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
@@ -19,7 +20,6 @@ export default React.memo(function Lane(props) {
             laneNo: lane.laneNo
         }
     });
-
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
@@ -29,9 +29,12 @@ export default React.memo(function Lane(props) {
     const [cardCreateMode, setCardCreateMode] = useState(false);
     const [cardTitle, setCardTitle] = useState("");
 
-    const handleCreateCard = useCallback(()=>{
-
-    },[]);
+    const handleCreateCard = useCallback(async () => {
+        await createCard(lane.laneNo, cardTitle);
+        await loadData(lane.boardNo);
+        setCardTitle("");
+        setCardCreateMode(false);
+    }, [lane, cardTitle]);
 
     useEffect(() => {
     }, []);
@@ -49,26 +52,25 @@ export default React.memo(function Lane(props) {
                         <Card key={cardId} id={cardId} card={cardMapInLane[cardId]} laneNo={lane.laneNo} laneId={id}></Card>
                     ))}
                 </SortableContext>
-            </div>
 
-            <div className="card-create-box">
-                {cardCreateMode === false ? (
-                    <button className="btn btn-secondary w-100" onClick={e=>setCardCreateMode(true)}>
-                        <FaPlus className="me-2" />
-                        <span>Add a card</span>
-                    </button>
-                ) : (
-                    <div>
-                        <input type="text" className="form-control mb-1" placeholder="Enter Card Title..."
-                            value={cardTitle} onChange={e => setCardTitle(e.target.value)} />
-                        <button className="btn btn-primary" onClick={handleCreateCard}>Add card</button>
-                        <button className="btn btn-secondary ms-1" onClick={e => setCardCreateMode(false)}>
-                            <FaXmark />
+                <div className="card-create-box">
+                    {cardCreateMode === false ? (
+                        <button className="btn btn-secondary w-100" onClick={e=>setCardCreateMode(true)}>
+                            <FaPlus className="me-2" />
+                            <span>Add a card</span>
                         </button>
-                    </div>
-                )}
+                    ) : (
+                        <div>
+                            <input type="text" className="form-control mb-1" placeholder="Enter Card Title..."
+                                value={cardTitle} onChange={e=>setCardTitle(e.target.value)} />
+                            <button className="btn btn-primary" onClick={handleCreateCard}>Add card</button>
+                            <button className="btn btn-secondary ms-1" onClick={e=>{setCardTitle(""); setCardCreateMode(false);}}>
+                                <FaXmark />
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-
         </div>
     </>)
 });

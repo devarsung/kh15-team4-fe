@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useMemo, act } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { closestCorners, pointerWithin, DndContext, DragOverlay } from "@dnd-kit/core";
+import { pointerWithin, DndContext, DragOverlay, useSensor, useSensors, MouseSensor, TouchSensor } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { throttle } from "lodash";
 import BoardInfo from "./BoardInfo";
@@ -11,10 +11,26 @@ import Card from "./Card";
 import { useKanban } from "../hooks/useKanban";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
+import CardModal from "./CardModal";
 
 export default function Board() {
     const { convertToMap, createLane, selectLaneFullList, updateLaneOrder,
         updateCardOrder, updateCardOrderBetween, moveBetweenLanes } = useKanban();
+
+    const mouseSensor = useSensor(MouseSensor, {
+        activationConstraint: {
+            distance: 10,
+        }
+    });
+    const touchSensor = useSensor(TouchSensor, {
+        activationConstraint: {
+            delay: 250,
+            tolerance: 5,
+        }
+    });
+
+    const sensors = useSensors(mouseSensor, touchSensor);
+
     const { boardNo } = useParams();
 
     const [laneCreateMode, setLaneCreateMode] = useState(false);
@@ -191,6 +207,8 @@ export default function Board() {
     const handleCreateLane = useCallback(async ()=>{
         await createLane(boardNo, laneTitle);
         await loadData(boardNo);
+        setLaneTitle("");
+        setLaneCreateMode(false);
     },[boardNo, laneTitle]);
 
     return (<>
@@ -200,7 +218,9 @@ export default function Board() {
             <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}
                 onDragCancel={handleDragCancel}
                 onDragOver={handleDragOver}
-                collisionDetection={pointerWithin}>
+                collisionDetection={pointerWithin}
+                sensors={sensors}
+            >
                 <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
                     {laneIdList.map(laneId => (
                         <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
@@ -238,9 +258,9 @@ export default function Board() {
                 ) : (
                     <div>
                         <input type="text" className="form-control mb-1" placeholder="Enter Lane Title..." 
-                            value={laneTitle} onChange={e => setLaneTitle(e.target.value)}/>
+                            value={laneTitle} onChange={e=>setLaneTitle(e.target.value)}/>
                         <button className="btn btn-primary" onClick={handleCreateLane}>Add lane</button>
-                        <button className="btn btn-secondary ms-1" onClick={e=>setLaneCreateMode(false)}>
+                        <button className="btn btn-secondary ms-1" onClick={e=>{setLaneTitle(""); setLaneCreateMode(false);}}>
                             <FaXmark />
                         </button>
                     </div>
@@ -248,5 +268,7 @@ export default function Board() {
             </div>
 
         </div>
+
+        <CardModal></CardModal>
     </>)
 }

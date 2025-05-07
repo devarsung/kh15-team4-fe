@@ -1,7 +1,6 @@
 .card {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     width: 100%;
     height: 30px;
     border: 1px solid gray;
@@ -9,3 +8,5 @@
     user-select: none;
     background-color: white;
 }
+
+  

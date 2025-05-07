@@ -22,8 +22,8 @@ export default function LaneHeader(props) {
                 {children}
             </div>
             <div className="col-4 p-0 text-end">
-                {/* <button className="border-0 p-0"><FaEdit/></button> */}
-                <button className="border-0 p-0 ms-2" onClick={handleDeleteLane}><FaTrashAlt/></button>
+                <button className="border-0 p-0"><FaEdit/></button>
+                <button className="border-0 p-0 ms-1" onClick={handleDeleteLane}><FaTrashAlt/></button>
             </div>
         </div>
     </>)
