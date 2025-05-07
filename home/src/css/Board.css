@@ -11,6 +11,10 @@
 .lane-area {
     display: flex;
     gap: 12px;
-    align-items: flex-start;  /* ✅ 레인끼리 높이 강제 안 함 */
-  }
-  
+    align-items: flex-start;
+    /* min-width: 1000px; */
+}
+
+.lane-create-box {
+    width: 200px;
+}

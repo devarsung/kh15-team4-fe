@@ -1,22 +1,20 @@
 import axios from "axios";
 import { useCallback } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { useKanban } from "../hooks/useKanban";
 
 export default function LaneHeader(props) {
-    const { setActivatorNodeRef, listeners, attributes, children, laneNo, loadLaneWithCardsList } = props;
+    const { setActivatorNodeRef, listeners, attributes, children, laneNo, loadData } = props;
+    const {deleteLane} = useKanban();
+
+    const handleDeleteLane = useCallback(async ()=>{
+        await deleteLane(laneNo);
+        await loadData();
+    },[laneNo]);
 
     const editLaneTitle = useCallback(async()=>{
 
     },[]);
-
-    const deleteLane = useCallback(async()=>{
-        try {
-            await axios.delete(`/lane/${laneNo}`);
-            loadLaneWithCardsList();
-        }
-        catch(e){}
-        
-    },[laneNo]);
 
     return (<>
         <div className="row px-2">
@@ -24,8 +22,8 @@ export default function LaneHeader(props) {
                 {children}
             </div>
             <div className="col-4 p-0 text-end">
-                <button className="border-0 p-0"><FaEdit/></button>
-                <button className="border-0 p-0 ms-2" onClick={deleteLane}><FaTrashAlt/></button>
+                {/* <button className="border-0 p-0"><FaEdit/></button> */}
+                <button className="border-0 p-0 ms-2" onClick={handleDeleteLane}><FaTrashAlt/></button>
             </div>
         </div>
     </>)

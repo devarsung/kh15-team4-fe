@@ -9,34 +9,37 @@ import Lane from "./Lane";
 import axios from "axios";
 import Card from "./Card";
 import { useKanban } from "../hooks/useKanban";
-import { removeAtIndex, insertAtIndex } from "../utils/array";
+import { FaPlus } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
 
 export default function Board() {
-    const {convertToMap, createLane, loadLaneFullList, updateLaneOrder,
-            updateCardOrder, updateCardOrderBetween, moveBetweenLanes} = useKanban();
+    const { convertToMap, createLane, selectLaneFullList, updateLaneOrder,
+        updateCardOrder, updateCardOrderBetween, moveBetweenLanes } = useKanban();
     const { boardNo } = useParams();
-    const [title, setTitle] = useState("");
 
-    //const [laneFullList, setLaneFullList] = useState([]);
+    const [laneCreateMode, setLaneCreateMode] = useState(false);
+    const [laneTitle, setLaneTitle] = useState("");
+
     const [laneMap, setLaneMap] = useState({});
     const [cardMap, setCardMap] = useState({});
     const [laneIdList, setLaneIdList] = useState([]);
     const [activeDragInfo, setActiveDragInfo] = useState(null);
 
     useEffect(() => {
-        const loadData = async()=>{
-            const data = await loadLaneFullList(boardNo);
-            const convertData = convertToMap(data);
-            setLaneMap(convertData.lanes);
-            setCardMap(convertData.cards);
-            setLaneIdList(convertData.laneIds);
-        };
         loadData();
     }, []);
 
+    const loadData = useCallback(async ()=>{
+        const data = await selectLaneFullList(boardNo);
+        const convertData = convertToMap(data);
+        setLaneMap(convertData.lanes);
+        setCardMap(convertData.cards);
+        setLaneIdList(convertData.laneIds);
+    },[]);
+
     const getCardMapInLane = useCallback((laneId) => {
         const map = {};
-        laneMap[laneId].cardIdList.forEach(cardId=>{
+        laneMap[laneId].cardIdList.forEach(cardId => {
             map[cardId] = cardMap[cardId];
         });
         return map;
@@ -70,7 +73,7 @@ export default function Board() {
 
     const handleDragOver = useCallback(throttle(event => {
         const { active, over } = event;
-        console.log("over시 active:",active, ", over:", over);
+        console.log("over시 active:", active, ", over:", over);
         if (!over || active.id === over.id) return;
 
         const activeType = active.data.current.type;
@@ -88,33 +91,33 @@ export default function Board() {
         const activeIndex = active.data.current.sortable.index;
         const overIndex = (activeType === overType) ? over.data.current.sortable.index : laneMap[overLaneId].cardIdList.length;
         const result = moveBetweenLanes(laneMap[activeLaneId].cardIdList, activeIndex, laneMap[overLaneId].cardIdList, overIndex, activeCardId);
-        setLaneMap(prev=>({
+        setLaneMap(prev => ({
             ...prev,
-            [activeLaneId]: {...prev[activeLaneId], cardIdList: result.before},
-            [overLaneId]: {...prev[overLaneId], cardIdList: result.after}
+            [activeLaneId]: { ...prev[activeLaneId], cardIdList: result.before },
+            [overLaneId]: { ...prev[overLaneId], cardIdList: result.after }
         }));
-        
+
         const orderDataMap = {
-            starting: result.before.map((item, index)=>({cardNo: cardMap[item].cardNo, cardOrder: index + 1})),
-            arrival: result.after.map((item, index)=>({cardNo: cardMap[item].cardNo, cardOrder: index + 1})),
-            card: {cardNo: cardMap[activeCardId].cardNo, laneNo: laneMap[overLaneId].laneNo}
+            starting: result.before.map((item, index) => ({ cardNo: cardMap[item].cardNo, cardOrder: index + 1 })),
+            arrival: result.after.map((item, index) => ({ cardNo: cardMap[item].cardNo, cardOrder: index + 1 })),
+            card: { cardNo: cardMap[activeCardId].cardNo, laneNo: laneMap[overLaneId].laneNo }
         };
-        
+
         try {
             updateCardOrderBetween(orderDataMap);
         }
-        catch(e) {
-            setLaneMap(prev=>({
+        catch (e) {
+            setLaneMap(prev => ({
                 ...prev,
-                [activeLaneId]: {...prev[activeLaneId], cardIdList: prevActiveLane},
-                [overLaneId]: {...prev[overLaneId], cardIdList: prevOverLane}
-            }));  
+                [activeLaneId]: { ...prev[activeLaneId], cardIdList: prevActiveLane },
+                [overLaneId]: { ...prev[overLaneId], cardIdList: prevOverLane }
+            }));
         }
     }, 350), [laneMap, cardMap]);
 
     const handleDragEnd = useCallback(event => {
         const { active, over } = event;
-        console.log("end시 active:",active, ", over:", over);
+        console.log("end시 active:", active, ", over:", over);
         if (!over || active.id === over.id) {
             setActiveDragInfo(null);
             return;
@@ -132,7 +135,7 @@ export default function Board() {
 
             const movedArray = arrayMove(laneIdList, activeIndex, overIndex);
             setLaneIdList(movedArray);
-            const orderDataList = movedArray.map((item, index)=>({
+            const orderDataList = movedArray.map((item, index) => ({
                 laneNo: laneMap[item].laneNo,
                 laneOrder: index + 1
             }));
@@ -140,7 +143,7 @@ export default function Board() {
             try {
                 updateLaneOrder(orderDataList);
             }
-            catch(e) {
+            catch (e) {
                 setLaneIdList(prevLaneIdList);
             }
             return;
@@ -162,9 +165,9 @@ export default function Board() {
             const movedArray = arrayMove(cardIdList, activeIndex, overIndex);
             setLaneMap(prev => ({
                 ...prev,
-                [activeLane]: {...prev[activeLane], cardIdList: movedArray}
+                [activeLane]: { ...prev[activeLane], cardIdList: movedArray }
             }));
-            
+
             const orderDataList = movedArray.map((item, index) => ({
                 cardNo: cardMap[item].cardNo,
                 cardOrder: index + 1
@@ -173,10 +176,10 @@ export default function Board() {
             try {
                 updateCardOrder(orderDataList);
             }
-            catch(e) {
+            catch (e) {
                 setLaneMap(prev => ({
                     ...prev,
-                    [activeLane]: {...prev[activeLane], cardIdList: prevCardIdList}
+                    [activeLane]: { ...prev[activeLane], cardIdList: prevCardIdList }
                 }));
             }
         }
@@ -184,16 +187,14 @@ export default function Board() {
         setActiveDragInfo(null);
 
     }, [laneIdList, laneMap, cardMap]);
-    
+
+    const handleCreateLane = useCallback(async ()=>{
+        await createLane(boardNo, laneTitle);
+        await loadData(boardNo);
+    },[boardNo, laneTitle]);
+
     return (<>
         <BoardInfo boardNo={boardNo} />
-
-        <div className="row">
-            <div className="col">
-                <input type="text" value={title} onChange={e => setTitle(e.target.value)} />
-                <button onClick={createLane}>+lane</button>
-            </div>
-        </div>
 
         <div className="mt-4 lane-area">
             <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}
@@ -202,7 +203,8 @@ export default function Board() {
                 collisionDetection={pointerWithin}>
                 <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
                     {laneIdList.map(laneId => (
-                        <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}></Lane>
+                        <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
+                            loadData={loadData}></Lane>
                     ))}
                 </SortableContext>
 
@@ -226,6 +228,24 @@ export default function Board() {
                 </DragOverlay>
 
             </DndContext>
+
+            <div className="lane-create-box">
+                {laneCreateMode === false ? (
+                    <button className="btn btn-secondary w-100 no-wrap" onClick={e=>setLaneCreateMode(true)}>
+                        <FaPlus className="me-2" />
+                        <span>Add another lane</span>
+                    </button>
+                ) : (
+                    <div>
+                        <input type="text" className="form-control mb-1" placeholder="Enter Lane Title..." 
+                            value={laneTitle} onChange={e => setLaneTitle(e.target.value)}/>
+                        <button className="btn btn-primary" onClick={handleCreateLane}>Add lane</button>
+                        <button className="btn btn-secondary ms-1" onClick={e=>setLaneCreateMode(false)}>
+                            <FaXmark />
+                        </button>
+                    </div>
+                )}
+            </div>
 
         </div>
     </>)

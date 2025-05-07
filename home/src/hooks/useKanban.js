@@ -31,10 +31,16 @@ export const useKanban = () => {
 
     const createLane = async (boardNo, laneTitle) => {
         await axios.post(`/lane/${boardNo}`, { laneTitle: laneTitle });
-        //loadLaneFullList();
     };
 
-    const loadLaneFullList = async (boardNo) => {
+    const deleteLane = async (laneNo) => {
+        try {
+            await axios.delete(`/lane/${laneNo}`);
+        }
+        catch(e){}
+    };
+
+    const selectLaneFullList = async (boardNo) => {
         const { data } = await axios.get(`/lane/lanefull/${boardNo}`);
         return data;
     };
@@ -58,6 +64,6 @@ export const useKanban = () => {
         return result;
     };
 
-    return { convertToMap, createLane, loadLaneFullList, updateLaneOrder, 
+    return { convertToMap, createLane, deleteLane, selectLaneFullList, updateLaneOrder, 
             updateCardOrder, updateCardOrderBetween, moveBetweenLanes };
 };

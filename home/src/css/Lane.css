@@ -16,10 +16,9 @@
     padding: 15px;
     display: flex;
     flex-direction: column;
-    min-height: 300px;
+    /* min-height: 300px; */
     align-items: stretch;
-  }
-  
+}
 
 .card-area {
     display: flex;
