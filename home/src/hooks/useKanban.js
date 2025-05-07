@@ -18,7 +18,7 @@ export const useKanban = () => {
     };
 
     const updateCardOrder = async (orderDataList) => {
-        await axios.put(`/card/order/`, orderDataList);
+        await axios.put(`/card/order`, orderDataList);
     };
 
     const moveBetweenLanes = (activeCardList, activeIndex, overCardList, overIndex, item) => {

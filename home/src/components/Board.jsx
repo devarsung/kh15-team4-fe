@@ -12,7 +12,7 @@ import { useKanban } from "../hooks/useKanban";
 import { removeAtIndex, insertAtIndex } from "../utils/array";
 
 export default function Board() {
-    const {createLane, loadLaneFullList, updateLaneOrder, moveBetweenLanes} = useKanban();
+    const {createLane, loadLaneFullList, updateLaneOrder, updateCardOrder, moveBetweenLanes} = useKanban();
     const { boardNo } = useParams();
     const [title, setTitle] = useState("");
 
@@ -87,12 +87,12 @@ export default function Board() {
                 })
             );
             const orderDataList = movedArray.map((item, index) => ({
-                cardNo: item.laneNo,
+                cardNo: item.cardNo,
                 cardOrder: index + 1
             }));
 
             try {
-
+                updateCardOrder(orderDataList);
             }
             catch(e) {
                 setLaneFullList(prevLaneFullList);
@@ -109,7 +109,6 @@ export default function Board() {
     const handleDragStart = useCallback((event) => {
         const { active } = event;
         const type = active.data.current.type;
-        //console.log(active);
 
         if (type === "card") {
             const laneNo = active.data.current.laneNo;
@@ -149,79 +148,63 @@ export default function Board() {
         const activeLaneNo = active.data.current.laneNo;
         const overLaneNo = over.data.current.laneNo;
         if (activeLaneNo === overLaneNo) return;
-        console.log(activeLaneNo, overLaneNo);
 
-        const prevLaneFullList = [...laneFullList];
-        const activeCardNo = active.data.current.cardNo;
+        const prevLaneFullList = [...laneFullList];//미리 백업
+        const activeCardNo = active.data.current.cardNo;//움직인 카드 번호
 
         const activeIndex = active.data.current.sortable.index;
         const overIndex = over.data.current.sortable.index;
 
-        //다른 레인의 카드들 사이에 끼어들어감
-        if(activeType === overType) {
-            
-            setLaneFullList(prev=>{
-                const activeCardList = prev.find(lane=>lane.laneNo === activeLaneNo).cardList;
-                const overCardList = prev.find(lane=>lane.laneNo === overLaneNo).cardList;
-                const targetCard = activeCardList.find(card=>card.cardNo === activeCardNo);
-                const result = moveBetweenLanes(activeCardList, activeIndex, overCardList, overIndex, targetCard);
-                return prev.map(lane=>{
-                    if(lane.laneNo === activeLaneNo) {
-                        return {
-                            ...lane,
-                            cardList: result.before
-                        }
+        const activeCardList = laneFullList.find(lane=>lane.laneNo === activeLaneNo).cardList;
+        const overCardList = laneFullList.find(lane=>lane.laneNo === overLaneNo).cardList;
+        const targetCard = activeCardList.find(card=>card.cardNo === activeCardNo);
+        let result;
+        
+        setLaneFullList(prev=>{
+            if(activeType === overType) {
+                //다른 레인의 카드들 사이에 끼어들어감
+                result = moveBetweenLanes(activeCardList, activeIndex, overCardList, overIndex, targetCard);
+            }
+            else {
+                //다른 빈 레인에 들어감
+                result = moveBetweenLanes(activeCardList, activeIndex, overCardList, 0, targetCard);
+            }
+
+            const orderData = {
+                starting: result.before,
+                arrival: result.after,
+                card: {cardNo: activeCardNo, laneNo: overLaneNo}
+            };
+            console.log(orderData);
+
+            return prev.map(lane=>{
+                if(lane.laneNo === activeLaneNo) {
+                    return {
+                        ...lane,
+                        cardList: result.before
                     }
-                    else if(lane.laneNo === overLaneNo) {
-                        return {
-                            ...lane,
-                            cardList: result.after
-                        }
+                }
+                else if(lane.laneNo === overLaneNo) {
+                    return {
+                        ...lane,
+                        cardList: result.after
                     }
-                    return lane;
-                });
+                }
+                return lane;
             });
-            try {
+        });
 
-            }
-            catch(e) {
-                console.log("에러");
-                setLaneFullList(prevLaneFullList);
-            }
+        
+
+        
+        
+        try {
+
         }
-        else {//다른 빈 레인에 들어감
-
-            setLaneFullList(prev=>{
-                const activeCardList = prev.find(lane=>lane.laneNo === activeLaneNo).cardList;
-                const overCardList = prev.find(lane=>lane.laneNo === overLaneNo).cardList;
-                const targetCard = activeCardList.find(card=>card.cardNo === activeCardNo);
-                const result = moveBetweenLanes(activeCardList, activeIndex, overCardList, 0, targetCard);
-                return prev.map(lane=>{
-                    if(lane.laneNo === activeLaneNo) {
-                        return {
-                            ...lane,
-                            cardList: result.before
-                        }
-                    }
-                    else if(lane.laneNo === overLaneNo) {
-                        return {
-                            ...lane,
-                            cardList: result.after
-                        }
-                    }
-                    return lane;
-                });
-            });
-
-            try {
-
-            }
-            catch(e) {
-                console.log("에러");
-                setLaneFullList(prevLaneFullList);
-            }
+        catch(e) {
+            console.log("에러");
+            setLaneFullList(prevLaneFullList);
         }
-
     }, 350), [laneFullList]);
 
     

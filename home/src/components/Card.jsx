@@ -7,7 +7,7 @@ export default React.memo(function Card(props) {
     const { id, card, laneNo, laneId } = props;
 
     if (!card) {
-        return null; // 혹은 에러 메시지 등
+        return null;
     }
 
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({

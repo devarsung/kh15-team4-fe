@@ -34,8 +34,6 @@ export default React.memo(function Lane(props) {
                 <h5>[{lane.laneNo}] {lane.laneTitle}</h5>
             </LaneHeader>
 
-            <p>order: {lane.laneOrder}</p>
-
             <div className="card-area">
                 <SortableContext items={lane.cardList.map(card => `card${card.cardNo}`)} strategy={rectSortingStrategy}>
                     {lane.cardList.map(card => (
