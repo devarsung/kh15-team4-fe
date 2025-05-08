@@ -1,30 +1,38 @@
-import { forwardRef, useImperativeHandle } from "react"
+import Modal from 'react-modal';
+import { useEffect, useState } from 'react';
+import "../css/CardModal.css";
 
-const CardModal = forwardRef((props, ref) => {
-    useImperativeHandle(ref, ()=>({
-        openModal: () => {},
-        closeModal: () => {}
-    }));
+export default function CardModal(props) {
+    const { isOpen, cardData, closeModal } = props;
+
+    useEffect(()=>{
+
+    },[]);
+    
     return (<>
-
-        <div className="modal fade" tabIndex="-1" ref={ref}>
-            <div className="modal-dialog modal-lg">
+        <Modal
+            isOpen={isOpen}
+            onRequestClose={closeModal}
+            className="modal d-block"
+            overlayClassName="card-modal-overlay"
+            bodyOpenClassName="modal-open"
+        >
+            <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 className="modal-title">{cardData?.cardTitle}</h5>
+                        <button type="button" className="btn-close" onClick={closeModal} aria-label="Close"></button>
                     </div>
                     <div className="modal-body">
-                        ...
+                        <p>Modal body text goes here.</p>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
                         <button type="button" className="btn btn-primary">Save changes</button>
                     </div>
                 </div>
             </div>
-        </div>
+            
+        </Modal>
     </>)
-});
-
-export default CardModal;
+}

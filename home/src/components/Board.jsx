@@ -9,10 +9,10 @@ import Lane from "./Lane";
 import axios from "axios";
 import Card from "./Card";
 import { useKanban } from "../hooks/useKanban";
+import { useModal } from "../hooks/useModal";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import CardModal from "./CardModal";
-import { Modal } from "bootstrap";
 
 export default function Board() {
     const { convertToMap, createLane, selectLaneFullList, updateLaneOrder,
@@ -29,10 +29,9 @@ export default function Board() {
             tolerance: 5,
         }
     });
-
     const sensors = useSensors(mouseSensor, touchSensor);
 
-    const { boardNo } = useParams();
+    const {boardNo} = useParams();
 
     const [laneCreateMode, setLaneCreateMode] = useState(false);
     const [laneTitle, setLaneTitle] = useState("");
@@ -41,6 +40,8 @@ export default function Board() {
     const [cardMap, setCardMap] = useState({});
     const [laneIdList, setLaneIdList] = useState([]);
     const [activeDragInfo, setActiveDragInfo] = useState(null);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -209,6 +210,10 @@ export default function Board() {
         setLaneCreateMode(false);
     },[boardNo, laneTitle]);
 
+
+    //모달
+    const {isOpen, openModal, closeModal, cardData} = useModal();
+
     return (<>
         <BoardInfo boardNo={boardNo} />
 
@@ -222,7 +227,7 @@ export default function Board() {
                 <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
                     {laneIdList.map(laneId => (
                         <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
-                            loadData={loadData}></Lane>
+                            loadData={loadData} openModal={openModal}></Lane>
                     ))}
                 </SortableContext>
 
@@ -267,6 +272,6 @@ export default function Board() {
 
         </div>
 
-        {/* <CardModal ref={modalRef}></CardModal> */}
+        <CardModal isOpen={isOpen} cardData={cardData} closeModal={closeModal}></CardModal>
     </>)
 }

@@ -4,7 +4,7 @@ import { CSS } from "@dnd-kit/utilities"
 import "../css/Card.css";
 
 export default React.memo(function Card(props) {
-    const { id, card, laneNo, laneId } = props;
+    const { id, card, laneNo, laneId, openModal } = props;
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
@@ -20,12 +20,13 @@ export default React.memo(function Card(props) {
         opacity: isDragging ? 0.5 : 1
     };
 
-    const clickclick = useCallback(() => {
-        console.log("clickclick");
-    }, []);
+    const handleModalOpen = useCallback(() => {
+        openModal(card.cardNo);
+    }, [card]);
 
     return (<>
-        <div className="card p-2" ref={setNodeRef} style={style} {...listeners} {...attributes} onClick={clickclick}>
+        <div className="card p-2" ref={setNodeRef} style={style} 
+            {...listeners} {...attributes} onClick={handleModalOpen}>
             <div>
                 <h6>[{card.cardNo}]{card.cardTitle}</h6>
             </div>
