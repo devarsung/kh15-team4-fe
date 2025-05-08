@@ -239,7 +239,7 @@ export default function Board() {
 
             <div className="lane-create-box">
                 {laneCreateMode === false ? (
-                    <button className="btn btn-secondary w-100 no-wrap" onClick={e=>setLaneCreateMode(true)}>
+                    <button className="btn btn-secondary w-100 text-nowrap" onClick={e=>setLaneCreateMode(true)}>
                         <FaPlus className="me-2" />
                         <span>Add another lane</span>
                     </button>
