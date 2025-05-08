@@ -210,7 +210,6 @@ export default function Board() {
         setLaneCreateMode(false);
     },[boardNo, laneTitle]);
 
-
     //모달
     const {isOpen, openModal, closeModal, cardData} = useModal();
 
@@ -219,10 +218,8 @@ export default function Board() {
 
         <div className="mt-4 lane-area">
             <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}
-                onDragCancel={handleDragCancel}
-                onDragOver={handleDragOver}
-                collisionDetection={pointerWithin}
-                sensors={sensors}
+                onDragCancel={handleDragCancel} onDragOver={handleDragOver}
+                collisionDetection={pointerWithin} sensors={sensors}
             >
                 <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
                     {laneIdList.map(laneId => (
@@ -233,23 +230,11 @@ export default function Board() {
 
                 <DragOverlay>
                     {activeDragInfo?.type === "card" ? (
-                        <Card
-                            id={activeDragInfo.id}
-                            card={activeDragInfo.card}
-                            laneNo={activeDragInfo.laneNo}
-                            laneId={activeDragInfo.laneId}
-                            dragOverlay
-                        />
+                        <Card {...activeDragInfo} dragOverlay/>
                     ) : activeDragInfo?.type === "lane" ? (
-                        <Lane
-                            id={activeDragInfo.id}
-                            lane={activeDragInfo.lane}
-                            cardMapInLane={activeDragInfo.cardMapInLane}
-                            dragOverlay
-                        />
+                        <Lane {...activeDragInfo} dragOverlay/>
                     ) : null}
                 </DragOverlay>
-
             </DndContext>
 
             <div className="lane-create-box">
@@ -269,7 +254,6 @@ export default function Board() {
                     </div>
                 )}
             </div>
-
         </div>
 
         <CardModal isOpen={isOpen} cardData={cardData} closeModal={closeModal}></CardModal>
