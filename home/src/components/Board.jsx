@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo, act } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { pointerWithin, DndContext, DragOverlay, useSensor, useSensors, MouseSensor, TouchSensor } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext, arrayMove } from "@dnd-kit/sortable";
@@ -12,6 +12,7 @@ import { useKanban } from "../hooks/useKanban";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import CardModal from "./CardModal";
+import { Modal } from "bootstrap";
 
 export default function Board() {
     const { convertToMap, createLane, selectLaneFullList, updateLaneOrder,
@@ -89,16 +90,15 @@ export default function Board() {
 
     const handleDragOver = useCallback(throttle(event => {
         const { active, over } = event;
-        console.log("over시 active:", active, ", over:", over);
         if (!over || active.id === over.id) return;
 
         const activeType = active.data.current.type;
         const overType = over.data.current.type;
-        if (activeType !== "card") return;
+        if (activeType !== "card") return;//카드가 아니면 return
 
         const activeLaneId = active.data.current.laneId;
-        const overLaneId = over.data.current.laneId || over.id;
-        if (activeLaneId === overLaneId) return;
+        const overLaneId = (activeType === overType) ? over.data.current.laneId : over.id;
+        if (activeLaneId === overLaneId) return;//같은 집이면 return
 
         const prevActiveLane = [...laneMap[activeLaneId].cardIdList];//미리 백업
         const prevOverLane = [...laneMap[overLaneId].cardIdList];//미리 백업
@@ -133,18 +133,16 @@ export default function Board() {
 
     const handleDragEnd = useCallback(event => {
         const { active, over } = event;
-        console.log("end시 active:", active, ", over:", over);
-        if (!over || active.id === over.id) {
-            setActiveDragInfo(null);
-            return;
-        }
-
+        setActiveDragInfo(null);
+        if (!over || active.id === over.id) return;
+        
+        const prevLaneIdList = [...laneIdList];
         const activeType = active.data.current.type;
         const overType = over.data.current.type;
-        const prevLaneIdList = [...laneIdList];
+        //console.log("end시 active:", active, ", over:", over);
 
-        //레인 이동
-        if (activeType === "lane") {
+        //레인에서 레인으로 이동
+        if (activeType === "lane" && overType === "lane") {
             const activeIndex = active.data.current.sortable.index;
             const overIndex = over.data.current.sortable.index;
             if (activeIndex === -1 || overIndex === -1) return;
@@ -165,43 +163,43 @@ export default function Board() {
             return;
         }
 
-        //카드 이동, activeType === "card"
+        //카드의 이동, activeType === "card"
+        //최종실행조건: 같은 레인 내 카드에서 카드로 이동
+        //1. overType이 lane이면 return
+        if(overType !== "card") return;
+
+        //카드에서 카드로 이동되는 상황만 남았음
         const activeLane = active.data.current.laneId;
-        const overLane = over.data.current.laneId;
+        const overLane = over.data.current.laneId;//undefined가 나오면 overType이 lane임
+        //2. laneId가 다르면 return (다른 집으로의 이동은 이미 dragOver에서 처리완료)
+        if (activeLane !== overLane) return;
+
         const activeIndex = active.data.current.sortable.index;
         const overIndex = over.data.current.sortable.index;
+        //console.log("같은 레인 내 카드에서카드로 이동");
 
-        console.log(activeLane);
-        console.log(overLane);
+        const cardIdList = laneMap[activeLane].cardIdList;
+        const prevCardIdList = [...cardIdList];
+        const movedArray = arrayMove(cardIdList, activeIndex, overIndex);
+        setLaneMap(prev => ({
+            ...prev,
+            [activeLane]: { ...prev[activeLane], cardIdList: movedArray }
+        }));
 
-        //같은 레인 내 카드 이동
-        if (activeLane === overLane) {
-            const cardIdList = laneMap[activeLane].cardIdList;
-            const prevCardIdList = [...cardIdList];
-            const movedArray = arrayMove(cardIdList, activeIndex, overIndex);
+        const orderDataList = movedArray.map((item, index) => ({
+            cardNo: cardMap[item].cardNo,
+            cardOrder: index + 1
+        }));
+
+        try {
+            updateCardOrder(orderDataList);
+        }
+        catch (e) {
             setLaneMap(prev => ({
                 ...prev,
-                [activeLane]: { ...prev[activeLane], cardIdList: movedArray }
+                [activeLane]: { ...prev[activeLane], cardIdList: prevCardIdList }
             }));
-
-            const orderDataList = movedArray.map((item, index) => ({
-                cardNo: cardMap[item].cardNo,
-                cardOrder: index + 1
-            }));
-
-            try {
-                updateCardOrder(orderDataList);
-            }
-            catch (e) {
-                setLaneMap(prev => ({
-                    ...prev,
-                    [activeLane]: { ...prev[activeLane], cardIdList: prevCardIdList }
-                }));
-            }
         }
-
-        setActiveDragInfo(null);
-
     }, [laneIdList, laneMap, cardMap]);
 
     const handleCreateLane = useCallback(async ()=>{
@@ -269,6 +267,6 @@ export default function Board() {
 
         </div>
 
-        <CardModal></CardModal>
+        {/* <CardModal ref={modalRef}></CardModal> */}
     </>)
 }

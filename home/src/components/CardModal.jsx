@@ -1,11 +1,14 @@
-export default function CardModal() {
-    return (<>
-        <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Launch demo modal
-        </button>
+import { forwardRef, useImperativeHandle } from "react"
 
-        <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div className="modal-dialog">
+const CardModal = forwardRef((props, ref) => {
+    useImperativeHandle(ref, ()=>({
+        openModal: () => {},
+        closeModal: () => {}
+    }));
+    return (<>
+
+        <div className="modal fade" tabIndex="-1" ref={ref}>
+            <div className="modal-dialog modal-lg">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
@@ -22,4 +25,6 @@ export default function CardModal() {
             </div>
         </div>
     </>)
-}
+});
+
+export default CardModal;

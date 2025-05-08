@@ -1,8 +1,7 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
 import "../css/Card.css";
-
 
 export default React.memo(function Card(props) {
     const { id, card, laneNo, laneId } = props;
@@ -21,18 +20,12 @@ export default React.memo(function Card(props) {
         opacity: isDragging ? 0.5 : 1
     };
 
-    const modal = useRef();
-    const openModal = useCallback(()=>{
-
-    },[modal]);
-    const closeModal = useCallback(()=>{},[modal]);
-
-    // const clickclick = useCallback(() => {
-    //     console.log("clickclick");
-    // }, []);
+    const clickclick = useCallback(() => {
+        console.log("clickclick");
+    }, []);
 
     return (<>
-        <div className="card p-2" ref={setNodeRef} style={style} {...listeners} {...attributes} onClick={openModal}>
+        <div className="card p-2" ref={setNodeRef} style={style} {...listeners} {...attributes} onClick={clickclick}>
             <div>
                 <h6>[{card.cardNo}]{card.cardTitle}</h6>
             </div>
