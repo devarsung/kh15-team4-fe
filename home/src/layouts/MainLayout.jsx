@@ -8,7 +8,7 @@ export default function MainLayout(){
          <TopMenu/>
 
          {/* 컨테이너 */}
-        <div className="container mt-5" style={{minHeight: "350px"}}>
+        <div className="container-fluid" style={{minHeight: "350px"}}>
             <Outlet/>
         </div>
         
