@@ -29,7 +29,7 @@ export default function MyWorkSpace() {
     }, []);
 
     const createBoard = useCallback(async () => {
-        if(boardTitle.length <= 0) {
+        if (boardTitle.length <= 0) {
             return;
         }
         await axios.post(`/board/`, { boardTitle: boardTitle }).then(resp => {
@@ -37,7 +37,7 @@ export default function MyWorkSpace() {
         });
     }, [boardTitle]);
 
-    const goToBoardDetail = useCallback((target)=>{
+    const goToBoardDetail = useCallback((target) => {
         navigate(`/board/${target.boardNo}`);
     }, []);
 
@@ -52,8 +52,8 @@ export default function MyWorkSpace() {
                 <div className="row row-cols-2 row-cols-md-4 g-4">
                     {myBoardList.map(board => (
                         <div className="col" key={board.boardNo}>
-                            <button className="btn btn-outline-secondary btn-workspace" 
-                                onClick={e=>goToBoardDetail(board)}>
+                            <button className="btn btn-outline-secondary btn-workspace"
+                                onClick={e => goToBoardDetail(board)}>
                                 {board.boardTitle}
                             </button>
                         </div>
@@ -62,21 +62,22 @@ export default function MyWorkSpace() {
                     {/* 버튼 */}
                     <div className="col">
                         {createMode === true ? (
-                            <div>
-                                <input type="text" className="form-control mb-1" placeholder="Enter Board Title..."
-                                    value={boardTitle} onChange={e=>setBoardTitle(e.target.value)} />
-                                <button className="btn btn-primary" onClick={createBoard}>create board</button>
-                                <button className="btn btn-secondary ms-1" onClick={e =>{setBoardTitle(""); setCreateMode(false);}}>
-                                    <FaXmark />
-                                </button>
+                            <div className="border rounded h-100 d-flex flex-column justify-content-between p-3 bg-light">
+                                <input type="text" className="form-control" placeholder="Enter Board Title..." 
+                                    value={boardTitle} onChange={e => setBoardTitle(e.target.value)}/>
+                                <div className="mt-3">
+                                    <button className="btn btn-sm btn-primary w-50 me-1" onClick={createBoard}>Create</button>
+                                    <button className="btn btn-sm btn-outline-secondary ms-1" onClick={e => { setBoardTitle(""); setCreateMode(false); }}><FaXmark /></button>
+                                </div>
                             </div>
                         ) : (
-                            <button className="btn btn-secondary btn-workspace" onClick={e=>setCreateMode(true)}>
+                            <button className="btn btn-secondary btn-workspace" onClick={e => setCreateMode(true)}>
                                 <FaPlus className="me-2" />
                                 <span>create board</span>
                             </button>
                         )}
                     </div>
+
                 </div>
             </div>
 
@@ -87,7 +88,7 @@ export default function MyWorkSpace() {
                         {guestBoardList.map(board => (
                             <div className="col" key={board.boardNo}>
                                 <button className="btn btn-outline-success btn-workspace"
-                                    onClick={e=>goToBoardDetail(board)}>
+                                    onClick={e => goToBoardDetail(board)}>
                                     {board.boardTitle}
                                 </button>
                             </div>

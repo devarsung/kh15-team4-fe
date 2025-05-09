@@ -214,6 +214,7 @@ export default function Board() {
     const {isOpen, openModal, closeModal, cardData} = useModal();
 
     return (<>
+        <div className="container">
         <BoardInfo boardNo={boardNo} />
 
         <div className="mt-4 lane-area">
@@ -255,6 +256,8 @@ export default function Board() {
                 )}
             </div>
         </div>
+        </div>
+        
 
         <CardModal isOpen={isOpen} cardData={cardData} closeModal={closeModal}></CardModal>
     </>)

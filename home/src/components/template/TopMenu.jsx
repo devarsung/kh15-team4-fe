@@ -47,6 +47,11 @@ export default function TopMenu() {
                             </Link>
                         </li>
                         <li className="nav-item">
+                            <Link to="/myWorkSpace" className="nav-link">
+                                workspace
+                            </Link>
+                        </li>
+                        <li className="nav-item">
                             <Link className="nav-link" onClick={quickLogin}>
                                 빠른로그인
                             </Link>
