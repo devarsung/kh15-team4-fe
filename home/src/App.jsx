@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import './App.css'
 import { ToastContainer, Bounce } from 'react-toastify';
+import TopMenu from './components/template/TopMenu'
 import Intro from './pages/Intro'
 import Login from './pages/Login'
 import Join from './pages/Join'
@@ -20,20 +21,19 @@ function App() {
   },[]);
 
   return (<>
+    {/* Top Menu */}
+    <TopMenu/>
 
     <Routes>
-
-      <Route element={<MainLayout />}>
+      <Route element={<EmptyLayout />}>
         <Route path="/" element={<Intro />} />
+      </Route>
+      <Route element={<MainLayout />}>
         <Route path="/login" element={<Login/>} />
         <Route path="/join" element={<Join/>} />
         <Route path="/board/:boardNo" element={<Private><Board/></Private>} />
         <Route path="/myPage" element={<Private><MyPage/></Private>} />
         <Route path="/myWorkSpace" element={<Private><MyWorkSpace/></Private>} />
-      </Route>
-
-      <Route element={<EmptyLayout />}>
-        
       </Route>
     </Routes>
 

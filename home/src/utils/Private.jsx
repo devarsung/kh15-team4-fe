@@ -1,16 +1,16 @@
 //로그인에 성공해야만 진입이 가능한 차단기
 //= Spring Boot의 인터셉터의 역할
 import { useRecoilValue } from "recoil";
-import { loginState, userLoadingState } from "./storage";
+import { loginState, authCheckedState } from "./storage";
 import { Navigate } from "react-router-dom";
 
 export default function Private({children}) {
     //recoil
-    const userLoading = useRecoilValue(userLoadingState);
+    const authChecked = useRecoilValue(authCheckedState);
     const isLogin = useRecoilValue(loginState);
 
     //view
-    if(userLoading === false) {//유저정보 로딩중이라면
+    if(authChecked === false) {//유저정보 로딩중이라면
         return (<h1>Loading...</h1>);//대기화면
     }
 

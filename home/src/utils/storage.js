@@ -1,27 +1,18 @@
 import {atom, selector} from "recoil";
 
-const userNoState = atom({
-    key: "userNoState",
-    default: null
-});
+const userNoState = atom({key: "userNoState",default: null});
+const userEmailState = atom({key: "userEmailState",default: null});
+const userNicknameState = atom({key: "userNicknameState",default: null});
 
-const userEmailState = atom({
-    key: "userEmailState",
-    default: null
-});
-
-const userLoadingState = atom({
-    key: "userLoadingState",
-    default: false
-});
-
-const loginState = selector({
+const authCheckedState  = atom({key: "userLoadedState",default: false});//refresh()가 비동기로 진행되기에 둔 플래그
+const loginState = selector({//로그인 상태
     key: "loginState",
     get: (state)=>{
         const userNo = state.get(userNoState);
         const userEmail = state.get(userEmailState);
-        return userNo !== null && userEmail !== null;
+        const authChecked = state.get(authCheckedState);
+        return authChecked && userNo !== null && userEmail !== null;
     }
 });
 
-export {userNoState, userEmailState, userLoadingState, loginState}
+export {userNoState, userEmailState, userNicknameState, authCheckedState, loginState}

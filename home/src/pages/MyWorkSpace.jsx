@@ -1,26 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { loginState, userLoadingState } from "../utils/storage";
-import { useRecoilValue } from "recoil";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import "../css/MyWorkSpace.css";
+import { useSign } from "../hooks/useSign";
 
 export default function MyWorkSpace() {
     const navigate = useNavigate();
+    const isLogin = useSign();
     const [myBoardList, setMyBoardList] = useState([]);
     const [guestBoardList, setGuestBoardList] = useState([]);
     const [createMode, setCreateMode] = useState(false);
     const [boardTitle, setBoardTitle] = useState("");
 
-    const userLoading = useRecoilValue(userLoadingState);
-    const isLogin = useRecoilValue(loginState);
     useEffect(() => {
-        if (userLoading === false) return;
         if (isLogin === false) return;
         loadData();
-    }, [userLoading, isLogin]);
+    }, [isLogin]);
 
     const loadData = useCallback(async () => {
         const { data } = await axios.get(`/board/`);

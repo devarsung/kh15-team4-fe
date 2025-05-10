@@ -1,13 +1,14 @@
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
-import { userNoState, userEmailState, loginState, userLoadingState } from "../utils/storage";
+import { userNoState, userEmailState, userNicknameState, authCheckedState, loginState } from "../utils/storage";
 import axios from "axios";
 
 export const useSign = () => {
     const isLogin = useRecoilValue(loginState);
     const [userNo, setUserNo] = useRecoilState(userNoState);
     const [userEmail, setUserEmail] = useRecoilState(userEmailState);
-    const [userLoading, setUserLoading] = useRecoilState(userLoadingState);
+    const [userNickname, setUserNickname] = useRecoilState(userNicknameState);
+    const [authChecked, setAuthChecked] = useRecoilState(authCheckedState);
     const navigate = useNavigate();
 
     const loginRequest = async (email, pw, stay) => {
@@ -18,6 +19,7 @@ export const useSign = () => {
 
         setUserNo(data.userNo);
         setUserEmail(data.userEmail);
+        setUserNickname(data.userNickname);
         axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
 
         if(stay) {
@@ -27,7 +29,6 @@ export const useSign = () => {
             window.localStorage.removeItem("refreshToken");
             window.sessionStorage.setItem("refreshToken", data.refreshToken);
         }
-
         navigate("/");
     };
 
@@ -41,6 +42,7 @@ export const useSign = () => {
         //recoil에 저장된 데이터 제거
         setUserNo(null);
         setUserEmail(null);
+        setUserNickname(null);
 
         //axios에 설정된 헤더(Authorization) 제거
         delete axios.defaults.headers.common["Authorization"];
@@ -49,19 +51,18 @@ export const useSign = () => {
         window.sessionStorage.removeItem("refreshToken");
         window.localStorage.removeItem("refreshToken");
 
-        //페이지 이동
         navigate("/");
     }
 
     const refreshLogin = async () => {
         if(isLogin === true) return;
-
         let stay = false;//로그인 상태 유지 체크박스
         let refreshToken = window.sessionStorage.getItem("refreshToken");
+
         if(refreshToken === null) {
             refreshToken = window.localStorage.getItem("refreshToken");
             if(refreshToken === null) {
-                setUserLoading(true);
+                setAuthChecked(true);
                 return;
             }
             else {
@@ -74,7 +75,7 @@ export const useSign = () => {
             const {data} = await axios.post("/account/refresh");
             setUserNo(data.userNo);
             setUserEmail(data.userEmail);
-
+            setUserNickname(data.userNickname);
             axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
 
             if(stay) {
@@ -86,12 +87,12 @@ export const useSign = () => {
                 window.sessionStorage.setItem("refreshToken", data.refreshToken);
             }
 
-            setUserLoading(true);
+            setAuthChecked(true);
         }
         catch(e) {
-            setUserLoading(true);
+            setAuthChecked(true);
         }
     }
 
-    return { loginRequest, logoutRequest, refreshLogin };
+    return { loginRequest, logoutRequest, refreshLogin, isLogin };
 };

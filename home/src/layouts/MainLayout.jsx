@@ -1,16 +1,10 @@
 import { Outlet } from 'react-router-dom'
-import TopMenu from '../components/template/TopMenu'
-
 export default function MainLayout(){
 
     return(<>
-        {/* Top Menu */}
-         <TopMenu/>
-
-         {/* 컨테이너 */}
-        <div className="container-fluid mb-5" style={{minHeight: "350px"}}>
+        {/* 컨테이너 */}
+        <div className="container-fluid mb-5 p-0" style={{minHeight: "350px"}}>
             <Outlet/>
         </div>
-        
     </>)
 }
