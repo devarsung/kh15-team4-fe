@@ -8,7 +8,7 @@ import Modal from 'react-modal'
 
 //apply bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootswatch/dist/cosmo/bootstrap.min.css";
+import "bootswatch/dist/zephyr/bootstrap.min.css";
 import "bootstrap";
 
 //axios 기본 주소 설정

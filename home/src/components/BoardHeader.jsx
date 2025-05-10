@@ -2,10 +2,13 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { FaUsers } from "react-icons/fa";
 import { BsFillPencilFill, BsFillPersonPlusFill, BsThreeDotsVertical, BsFillTrash3Fill  } from "react-icons/bs"
+import UserSearchModal from "./UserSearchModal";
+import { useModal } from "../hooks/useModal";
 
 export default function BoardHeader(props) {
     const boardNo = props.boardNo;
     const [board, setBoard] = useState({});
+    const {isOpen, openModal, closeModal} = useModal();
 
     useEffect(() => {
         loadBoardInfo();
@@ -16,8 +19,12 @@ export default function BoardHeader(props) {
         setBoard(data);
     }, []);
 
+    const handleSearchModalOpen = useCallback(()=>{
+        openModal();
+    },[]);
+
     return (<>
-        <div className="container-fluid py-3 px-4 bg-white border-bottom shadow-sm rounded">
+        <div className="container-fluid py-3 px-4 bg-white border-bottom">
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div className="d-flex align-items-center flex-wrap">
                     <h3 className="mb-0 me-2 fw-semibold text-primary">{board.boardTitle}</h3>
@@ -66,7 +73,8 @@ export default function BoardHeader(props) {
                         </div>
                     </div>
 
-                    <button className="btn btn-outline-primary btn-sm d-flex align-items-center">
+                    <button className="btn btn-outline-primary btn-sm d-flex align-items-center"
+                        onClick={handleSearchModalOpen}>
                         <BsFillPersonPlusFill className="me-1"/>
                         <span>초대</span>
                     </button>
@@ -98,5 +106,6 @@ export default function BoardHeader(props) {
             </div>
         </div>
 
+        <UserSearchModal isOpen={isOpen} closeModal={closeModal}/>
     </>)
 }
