@@ -39,7 +39,7 @@ export default function MyWorkSpace() {
     }, []);
 
     return (<>
-        <div className="container">
+        <div className="container my-4">
             <div className="mt-4">
                 <h2>WorkSpace</h2>
             </div>

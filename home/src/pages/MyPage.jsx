@@ -31,8 +31,8 @@ export default function MyPage() {
     }, []);
 
     return (<>
-        <div className="container mt-4">
-                <div className="mt-4">
+        <div className="container my-4">
+            <div className="mt-4">
                 <h2>My Page</h2>
             </div>
 
