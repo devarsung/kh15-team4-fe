@@ -3,9 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { throttle, debounce } from "lodash";
 import axios from 'axios';
 import Avatar from './Avatar';
+import { toast } from 'react-toastify';
 
 export default function UserSearchModal(props) {
-    const { isOpen, closeModal } = props;
+    const { isOpen, closeModal, boardNo } = props;
     const [keyword, setKeyword] = useState("");
     const [beginRow, setBeginRow] = useState(null);
     const [endRow, setEndRow] = useState(null);
@@ -35,6 +36,17 @@ export default function UserSearchModal(props) {
         closeModal();
     },[]);
 
+    const inviteRequest = useCallback(async (target)=>{
+        console.log(boardNo, target.accountNo);
+        try{
+            await axios.post(`/board/invite`, {boardNo: boardNo, receiverNo: target.accountNo});    
+            toast.success("초대신청을 보냈습니다");
+        }
+        catch(e) {
+            toast.error("오류가 발생했습니다. 잠시후 다시 시도하세요");
+        }
+    },[boardNo]);
+
     return (<>
         <Modal
             isOpen={isOpen}
@@ -63,7 +75,7 @@ export default function UserSearchModal(props) {
                                             <div className="text-muted" style={{fontSize: "0.875rem"}}>{user.accountEmail}</div>
                                         </div>
                                     </div>
-                                    <button className="btn btn-primary btn-sm">초대하기</button>
+                                    <button className="btn btn-primary btn-sm" onClick={e=>inviteRequest(user)}>초대하기</button>
                                 </li>
                             ))}
                         </ul>

@@ -106,6 +106,6 @@ export default function BoardHeader(props) {
             </div>
         </div>
 
-        <UserSearchModal isOpen={isOpen} closeModal={closeModal}/>
+        <UserSearchModal isOpen={isOpen} closeModal={closeModal} boardNo={boardNo}/>
     </>)
 }

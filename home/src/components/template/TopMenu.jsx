@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaDatabase, FaDollarSign, FaGear, FaList, FaRightFromBracket, FaRightToBracket, FaUser } from "react-icons/fa6";
+import { BsEnvelopePaperFill } from "react-icons/bs";
 import { FaBell } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { userNicknameState } from "../../utils/storage";
@@ -20,6 +21,14 @@ export default function TopMenu() {
         e.preventDefault();
         const email = "devarsung@gmail.com";
         const pw = "helloworld";
+        const stay = false;
+        loginRequest(email, pw, stay);
+    }, []);
+
+    const quickLogin2 = useCallback((e) => {
+        e.preventDefault();
+        const email = "milkcar777@gmail.com";
+        const pw = "Password1!";
         const stay = false;
         loginRequest(email, pw, stay);
     }, []);
@@ -58,6 +67,11 @@ export default function TopMenu() {
                                 빠른로그인
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" onClick={quickLogin2}>
+                                빠른로그인2
+                            </Link>
+                        </li>
                         <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
                             <div className="dropdown-menu">
@@ -73,14 +87,14 @@ export default function TopMenu() {
                     <ul className="navbar-nav ms-auto">
                         {isLogin ? (<>
                             <li className="nav-item d-flex align-items-center">
-                                <a href="#" className="nav-link d-flex justify-content-center align-items-center position-relative" style={{height: "48px"}}>
-                                    <FaBell className="fs-3"/>
-                                    <span className="badge bg-danger position-absolute translate-middle-x" style={{top:"5px", left: "32px"}}>
+                                <Link to="/invitation" className="nav-link d-flex justify-content-center align-items-center position-relative" style={{height:"48px"}}>
+                                    <BsEnvelopePaperFill className="fs-3"/>
+                                    <span className="badge bg-danger position-absolute translate-middle-x" style={{top:"5px", left: "40px"}}>
                                         1
                                     </span>
-                                </a>
+                                </Link>
                             </li>
-                            <li className="nav-item dropdown">
+                            <li className="nav-item dropdown ms-0">
                                 <a href="#" className="nav-link d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" role="button">
                                     <Avatar nickname={userNickname} size={40}></Avatar>
                                 </a>

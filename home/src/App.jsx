@@ -13,6 +13,7 @@ import EmptyLayout from './layouts/EmptyLayout'
 import { useSign } from "./hooks/useSign";
 import Private from './utils/Private';
 import MyWorkSpace from './pages/MyWorkSpace';
+import Invitation from './pages/Invitation';
 
 function App() {
   const {refreshLogin} = useSign();
@@ -31,9 +32,10 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/login" element={<Login/>} />
         <Route path="/join" element={<Join/>} />
-        <Route path="/board/:boardNo" element={<Private><Board/></Private>} />
+        <Route path="/invitation" element={<Private><Invitation/></Private>} />
         <Route path="/myPage" element={<Private><MyPage/></Private>} />
         <Route path="/myWorkSpace" element={<Private><MyWorkSpace/></Private>} />
+        <Route path="/board/:boardNo" element={<Private><Board/></Private>} />
       </Route>
     </Routes>
 
