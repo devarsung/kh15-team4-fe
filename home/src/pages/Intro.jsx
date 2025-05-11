@@ -24,17 +24,17 @@ export default function Intro() {
             <div className="container-fluid">
                 <div className="row text-center align-items-center justify-content-center">
                     <div className="col-md-4 d-flex flex-column align-items-center mb-4">
-                        <FaTasks className="fs-1 text-secondary mb-3"/>
+                        <FaTasks className="fs-1 mb-3"/>
                         <h5 className="fw-semibold">할 일 관리</h5>
                         <p className="text-muted text-center">변경사항이 즉시 공유되어 팀 전체가 항상 최신 상태로 협업할 수 있어요.</p>
                     </div>
                     <div className="col-md-4 mb-4">
-                        <BsEasel2Fill className="fs-1 text-secondary mb-3"/>
+                        <BsEasel2Fill className="fs-1 mb-3"/>
                         <h5 className="fw-semibold">사용자 친화적 UI</h5>
                         <p className="text-muted">누구나 쉽게 사용할 수 있는 인터페이스로 빠른 적응이 가능합니다.</p>
                     </div>
                     <div className="col-md-4 mb-4">
-                        <FaUsers className="fs-1 text-secondary mb-3"/>
+                        <FaUsers className="fs-1 mb-3"/>
                         <h5 className="fw-semibold">팀 협업</h5>
                         <p className="text-muted">멤버 초대, 권한 설정 등 협업에 최적화된 기능을 제공합니다.</p>
                     </div>

@@ -94,5 +94,9 @@ export const useSign = () => {
         }
     }
 
-    return { loginRequest, logoutRequest, refreshLogin, isLogin };
+    const updateNickname = (newNickname) => {
+        setUserNickname(newNickname);
+    }
+
+    return { loginRequest, logoutRequest, refreshLogin, isLogin, updateNickname };
 };

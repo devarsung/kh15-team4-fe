@@ -8,7 +8,7 @@ export default function Avatar(props) {
     useEffect(()=>{
         setInitials(createInitials(nickname))
         setBgColor(createBgColor(nickname));
-    },[]);
+    },[nickname]);
 
     const createInitials = useCallback((nickname)=>{
         const maxLength = getMaxLength(nickname);
@@ -35,6 +35,7 @@ export default function Avatar(props) {
 
     return (<>
         <div
+            // className="rounded-circle"
             style={{
                 width: size,
                 height: size,

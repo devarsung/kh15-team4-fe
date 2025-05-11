@@ -8,7 +8,7 @@ import { useSign } from "../hooks/useSign";
 
 export default function MyWorkSpace() {
     const navigate = useNavigate();
-    const isLogin = useSign();
+    const {isLogin} = useSign();
     const [myBoardList, setMyBoardList] = useState([]);
     const [guestBoardList, setGuestBoardList] = useState([]);
     const [createMode, setCreateMode] = useState(false);
