@@ -1,19 +1,43 @@
-.board {
-    
+.kanban-board {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9f9fb;
+    background-size: 100% 60px;
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    min-height: 600px;
+    height: 100%;
 }
 
-/* .lane-area {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-} */
-
-.lane-area {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    /* min-width: 1000px; */
+/*  */
+.btn-more {
+    all: unset;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: #333;
 }
+
+.btn-more.dropdown-toggle::after {
+    display: none !important;
+}
+
+.btn-more:focus,
+.btn-more:active,
+.btn-more.show,
+.btn-more.dropdown-toggle:focus,
+.btn-more.dropdown-toggle:active,
+.btn-more.dropdown-toggle.show {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/*  */
 
 .lane-create-box {
     width: 200px;

@@ -4,11 +4,11 @@ import { rectSortingStrategy, SortableContext, arrayMove } from "@dnd-kit/sortab
 import React, { useCallback } from "react";
 import { useEffect, useState } from "react";
 import LaneHeader from "./LaneHeader";
-import "../css/Lane.css";
 import Card from "./Card";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { useKanban } from "../hooks/useKanban";
+import "../css/Lane.css";
 
 export default React.memo(function Lane(props) {
     const { createCard } = useKanban();
@@ -40,38 +40,38 @@ export default React.memo(function Lane(props) {
     }, []);
 
     return (<>
-        <div className="lane" ref={setNodeRef} style={style}>
+        <div className="kanban-lane" ref={setNodeRef} style={style}>
             <LaneHeader setActivatorNodeRef={setActivatorNodeRef} listeners={listeners} attributes={attributes}
                 laneNo={lane.laneNo} loadData={loadData}>
                 <h5>[{lane.laneNo}] {lane.laneTitle}</h5>
             </LaneHeader>
 
-            <div className="card-area">
-                <SortableContext items={lane.cardIdList.map(cardId => cardId)} strategy={rectSortingStrategy}>
-                    {lane.cardIdList.map(cardId => (
-                        <Card key={cardId} id={cardId} card={cardMapInLane[cardId]} 
-                            laneNo={lane.laneNo} laneId={id} openModal={openModal}></Card>
-                    ))}
-                </SortableContext>
+            <SortableContext items={lane.cardIdList.map(cardId => cardId)} strategy={rectSortingStrategy}>
+                {lane.cardIdList.map(cardId => (
+                    <Card key={cardId} id={cardId} card={cardMapInLane[cardId]} 
+                        laneNo={lane.laneNo} laneId={id} openModal={openModal}></Card>
+                ))}
+            </SortableContext>
 
-                <div className="card-create-box">
-                    {cardCreateMode === false ? (
-                        <button className="btn btn-secondary w-100" onClick={e=>setCardCreateMode(true)}>
-                            <FaPlus className="me-2" />
-                            <span>Add a card</span>
+            <div className="card-create-box">
+                {cardCreateMode === false ? (
+                    <button className="btn btn-secondary w-100" onClick={e=>setCardCreateMode(true)}>
+                        <FaPlus className="me-2" />
+                        <span>Add a card</span>
+                    </button>
+                ) : (
+                    <div>
+                        <input type="text" className="form-control mb-1" placeholder="Enter Card Title..."
+                            value={cardTitle} onChange={e=>setCardTitle(e.target.value)} />
+                        <button className="btn btn-primary" onClick={handleCreateCard}>Add card</button>
+                        <button className="btn btn-secondary ms-1" onClick={e=>{setCardTitle(""); setCardCreateMode(false);}}>
+                            <FaXmark />
                         </button>
-                    ) : (
-                        <div>
-                            <input type="text" className="form-control mb-1" placeholder="Enter Card Title..."
-                                value={cardTitle} onChange={e=>setCardTitle(e.target.value)} />
-                            <button className="btn btn-primary" onClick={handleCreateCard}>Add card</button>
-                            <button className="btn btn-secondary ms-1" onClick={e=>{setCardTitle(""); setCardCreateMode(false);}}>
-                                <FaXmark />
-                            </button>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
+
+
         </div>
     </>)
 });

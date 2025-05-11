@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
+import { BsThreeDotsVertical } from "react-icons/bs";
 import "../css/Card.css";
 
 export default React.memo(function Card(props) {
@@ -14,10 +15,17 @@ export default React.memo(function Card(props) {
             laneId: laneId
         }
     });
+
+    const colors = ["#FFEB3B", "#FFD54F", "#AED581", "#81D4FA", "#CE93D8", "#FFF59D"];
+    const createBgColor = useCallback(()=>{
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        return randomColor;
+    },[]);
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        opacity: isDragging ? 0.5 : 1
+        opacity: isDragging ? 0.5 : 1,
+        backgroundColor: createBgColor()
     };
 
     const handleModalOpen = useCallback(() => {
@@ -25,15 +33,32 @@ export default React.memo(function Card(props) {
     }, [card]);
 
     return (<>
-        <div className="card p-2" ref={setNodeRef} style={style} 
+        <div className="kanban-card" ref={setNodeRef} style={style} 
             {...listeners} {...attributes} onClick={handleModalOpen}>
-            <div>
-                <h6>[{card.cardNo}]{card.cardTitle}</h6>
+            <div className="card-header">
+                <div className="form-check form-check-custom">
+                    <input className="form-check-input rounded-circle" type="checkbox"/>
+                </div>
+                <div className="dropdown">
+                    <button className="btn border-0 bg-transparent text-dark btn-more dropdown-toggle p-0" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <BsThreeDotsVertical />
+                    </button>
+                    <ul className="dropdown-menu dropdown-menu-end dropdown-menu-sm-start">
+                        <li><a className="dropdown-item" href="#">편집</a></li>
+                        <li><a className="dropdown-item" href="#">삭제</a></li>
+                    </ul>
+                </div>
             </div>
-            <div className="d-flex justify-content-between align-items-center">
-                <input type="checkbox" className="form-check-input z-3"/>
-                <img src="/profile.jpg" className="rounded-circle z-3" />
+
+            <div className="card-body">
+                [{card.cardNo}]{card.cardTitle}
+            </div>
+
+            <div className="card-footer">
+                <img className="avatar" src="https://i.pravatar.cc/32?img=10" alt="avatar" />
             </div>
         </div>
+
     </>)
 });

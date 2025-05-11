@@ -18,11 +18,11 @@ export default function Board() {
     const { convertToMap, createLane, selectLaneFullList, updateLaneOrder,
         updateCardOrder, updateCardOrderBetween, moveBetweenLanes } = useKanban();
 
-    const mouseSensor = useSensor(MouseSensor, {activationConstraint: {distance: 10}});
-    const touchSensor = useSensor(TouchSensor, {activationConstraint: {delay: 250,tolerance: 5}});
+    const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
+    const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } });
     const sensors = useSensors(mouseSensor, touchSensor);
 
-    const {boardNo} = useParams();
+    const { boardNo } = useParams();
 
     const [laneCreateMode, setLaneCreateMode] = useState(false);
     const [laneTitle, setLaneTitle] = useState("");
@@ -38,13 +38,13 @@ export default function Board() {
         loadData();
     }, []);
 
-    const loadData = useCallback(async ()=>{
+    const loadData = useCallback(async () => {
         const data = await selectLaneFullList(boardNo);
         const convertData = convertToMap(data);
         setLaneMap(convertData.lanes);
         setCardMap(convertData.cards);
         setLaneIdList(convertData.laneIds);
-    },[]);
+    }, []);
 
     const getCardMapInLane = useCallback((laneId) => {
         const map = {};
@@ -127,7 +127,7 @@ export default function Board() {
         const { active, over } = event;
         setActiveDragInfo(null);
         if (!over || active.id === over.id) return;
-        
+
         const prevLaneIdList = [...laneIdList];
         const activeType = active.data.current.type;
         const overType = over.data.current.type;
@@ -158,7 +158,7 @@ export default function Board() {
         //카드의 이동, activeType === "card"
         //최종실행조건: 같은 레인 내 카드에서 카드로 이동
         //1. overType이 lane이면 return
-        if(overType !== "card") return;
+        if (overType !== "card") return;
 
         //카드에서 카드로 이동되는 상황만 남았음
         const activeLane = active.data.current.laneId;
@@ -194,59 +194,57 @@ export default function Board() {
         }
     }, [laneIdList, laneMap, cardMap]);
 
-    const handleCreateLane = useCallback(async ()=>{
+    const handleCreateLane = useCallback(async () => {
         await createLane(boardNo, laneTitle);
         await loadData(boardNo);
         setLaneTitle("");
         setLaneCreateMode(false);
-    },[boardNo, laneTitle]);
+    }, [boardNo, laneTitle]);
 
     //모달
-    const {isOpen, openModal, closeModal, cardData} = useModal();
+    const { isOpen, openModal, closeModal, cardData } = useModal();
 
     return (<>
-            <BoardHeader boardNo={boardNo} />
+        <BoardHeader boardNo={boardNo} />
 
-            <div className="mt-4 lane-area">
-                <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}
-                    onDragCancel={handleDragCancel} onDragOver={handleDragOver}
-                    collisionDetection={pointerWithin} sensors={sensors}
-                >
-                    <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
-                        {laneIdList.map(laneId => (
-                            <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
-                                loadData={loadData} openModal={openModal}></Lane>
-                        ))}
-                    </SortableContext>
+        <div className="kanban-board">
+            <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}
+                onDragCancel={handleDragCancel} onDragOver={handleDragOver}
+                collisionDetection={pointerWithin} sensors={sensors}
+            >
+                <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
+                    {laneIdList.map(laneId => (
+                        <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
+                            loadData={loadData} openModal={openModal}></Lane>
+                    ))}
+                </SortableContext>
 
-                    <DragOverlay>
-                        {activeDragInfo?.type === "card" ? (
-                            <Card {...activeDragInfo} dragOverlay/>
-                        ) : activeDragInfo?.type === "lane" ? (
-                            <Lane {...activeDragInfo} dragOverlay/>
-                        ) : null}
-                    </DragOverlay>
-                </DndContext>
-
-                <div className="lane-create-box">
-                    {laneCreateMode === false ? (
-                        <button className="btn btn-secondary w-100 text-nowrap" onClick={e=>setLaneCreateMode(true)}>
-                            <FaPlus className="me-2" />
-                            <span>Add another lane</span>
+                <DragOverlay>
+                    {activeDragInfo?.type === "card" ? (
+                        <Card {...activeDragInfo} dragOverlay />
+                    ) : activeDragInfo?.type === "lane" ? (
+                        <Lane {...activeDragInfo} dragOverlay />
+                    ) : null}
+                </DragOverlay>
+            </DndContext>
+            <div className="lane-create-box">
+                {laneCreateMode === false ? (
+                    <button className="btn btn-secondary w-100 text-nowrap" onClick={e => setLaneCreateMode(true)}>
+                        <FaPlus className="me-2" />
+                        <span>Add another lane</span>
+                    </button>
+                ) : (
+                    <div>
+                        <input type="text" className="form-control mb-1" placeholder="Enter Lane Title..."
+                            value={laneTitle} onChange={e => setLaneTitle(e.target.value)} />
+                        <button className="btn btn-primary" onClick={handleCreateLane}>Add lane</button>
+                        <button className="btn btn-secondary ms-1" onClick={e => { setLaneTitle(""); setLaneCreateMode(false); }}>
+                            <FaXmark />
                         </button>
-                    ) : (
-                        <div>
-                            <input type="text" className="form-control mb-1" placeholder="Enter Lane Title..." 
-                                value={laneTitle} onChange={e=>setLaneTitle(e.target.value)}/>
-                            <button className="btn btn-primary" onClick={handleCreateLane}>Add lane</button>
-                            <button className="btn btn-secondary ms-1" onClick={e=>{setLaneTitle(""); setLaneCreateMode(false);}}>
-                                <FaXmark />
-                            </button>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
-        
+        </div>
 
         <CardModal isOpen={isOpen} cardData={cardData} closeModal={closeModal}></CardModal>
     </>)
