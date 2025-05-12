@@ -68,11 +68,25 @@ export const useWebSocketClient = () => {
         }
     }, []);
 
+    const publish = useCallback(async (messageData)=>{
+        await connect();    
+        const {destination, object} = messageData;
+        //const json = {content: input};
+
+        const stompMessage = {
+            destination: destination || `/app/group/${roomNo}`,
+            headers: {accessToken: userAccessToken},
+            body: JSON.stringify(object)
+        };
+
+        stompClient.publish(stompMessage);
+    },[userAccessToken]);
+
     useEffect(() => {
         return () => {
             disconnect();
         };
     }, []);
 
-    return { connect, subscribe, disconnect };
+    return { connect, subscribe, disconnect, publish };
 };

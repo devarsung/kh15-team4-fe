@@ -4,6 +4,7 @@ import { throttle, debounce } from "lodash";
 import axios from 'axios';
 import Avatar from './Avatar';
 import { toast } from 'react-toastify';
+import { useWebSocketClient } from '../hooks/useWebSocketClient';
 
 export default function UserSearchModal(props) {
     const { isOpen, closeModal, boardNo } = props;
@@ -11,41 +12,51 @@ export default function UserSearchModal(props) {
     const [beginRow, setBeginRow] = useState(null);
     const [endRow, setEndRow] = useState(null);
 
-    const [userList, setUserList] =  useState([]);
+    const [userList, setUserList] = useState([]);
     const [page, setPage] = useState(1);
-    const [size, setSize]= useState(10);
+    const [size, setSize] = useState(10);
     const [last, setLast] = useState(true);
 
-    useEffect(()=>{
-        searchUsers(keyword);
-    },[keyword]);
+    const { publish } = useWebSocketClient();
 
-    const searchUsers = useCallback(throttle(async (keyword)=>{
-        if(keyword.length < 3) {
+    useEffect(() => {
+        searchUsers(keyword);
+    }, [keyword]);
+
+    const searchUsers = useCallback(throttle(async (keyword) => {
+        if (keyword.length < 3) {
             setUserList([]);
             return;
         }
 
-        const {data} = await axios.post(`/account/search`, {keyword: keyword});
+        const { data } = await axios.post(`/account/search`, { keyword: keyword });
         setUserList(data);
     }, 250), []);
 
-    const handleCloseModal = useCallback(()=>{
+    const handleCloseModal = useCallback(() => {
         setKeyword("");
         setUserList([]);
         closeModal();
-    },[]);
+    }, []);
 
-    const inviteRequest = useCallback(async (target)=>{
+    const inviteRequest = useCallback(async (target) => {
         console.log(boardNo, target.accountNo);
-        try{
-            await axios.post(`/board/invite`, {boardNo: boardNo, receiverNo: target.accountNo});    
-            toast.success("초대신청을 보냈습니다");
-        }
-        catch(e) {
-            toast.error("오류가 발생했습니다. 잠시후 다시 시도하세요");
-        }
-    },[boardNo]);
+        const messageData = {
+            destination: `/app/invite`,
+            object: {
+                boardNo: boardNo,
+                receiverNo: target.accountNo
+            }
+        };
+        publish(messageData);
+        // try {
+        //     await axios.post(`/board/invite`, { boardNo: boardNo, receiverNo: target.accountNo });
+        //     toast.success("초대신청을 보냈습니다");
+        // }
+        // catch (e) {
+        //     toast.error("오류가 발생했습니다. 잠시후 다시 시도하세요");
+        // }
+    }, [boardNo]);
 
     return (<>
         <Modal
@@ -63,19 +74,19 @@ export default function UserSearchModal(props) {
                     </div>
                     <div className="modal-body">
                         <input type="text" className="form-control mb-3" placeholder="닉네임 또는 이메일 검색..." autoComplete="off"
-                            value={keyword} onChange={e=>setKeyword(e.target.value)}/>
+                            value={keyword} onChange={e => setKeyword(e.target.value)} />
                         <ul className="list-group">
-                            {userList.map(user=>(
+                            {userList.map(user => (
                                 <li key={user.accountNo} className="list-group-item d-flex align-items-center justify-content-between">
                                     <div className="d-flex align-items-center">
                                         {/* <img src="https://picsum.photos/seed/picsum/200/300" className="rounded-circle me-3" width="40" height="40" alt="프로필" /> */}
-                                        <Avatar nickname={user.accountNickname} size={40}/>
+                                        <Avatar nickname={user.accountNickname} size={40} />
                                         <div className="ms-3">
                                             <div className="fw-bold">{user.accountNickname}</div>
-                                            <div className="text-muted" style={{fontSize: "0.875rem"}}>{user.accountEmail}</div>
+                                            <div className="text-muted" style={{ fontSize: "0.875rem" }}>{user.accountEmail}</div>
                                         </div>
                                     </div>
-                                    <button className="btn btn-primary btn-sm" onClick={e=>inviteRequest(user)}>초대하기</button>
+                                    <button className="btn btn-primary btn-sm" onClick={e => inviteRequest(user)}>초대하기</button>
                                 </li>
                             ))}
                         </ul>
