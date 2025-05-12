@@ -1,13 +1,15 @@
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
-import { userNoState, userEmailState, userNicknameState, authCheckedState, loginState } from "../utils/storage";
+import { userNoState, userEmailState, userNicknameState, authCheckedState, loginState, userAccessTokenState } from "../utils/storage";
 import axios from "axios";
+import { useWebSocketClient } from "./useWebSocketClient";
 
 export const useSign = () => {
     const isLogin = useRecoilValue(loginState);
     const [userNo, setUserNo] = useRecoilState(userNoState);
     const [userEmail, setUserEmail] = useRecoilState(userEmailState);
     const [userNickname, setUserNickname] = useRecoilState(userNicknameState);
+    const [userAccessToken, setUserAccessToken] = useRecoilState(userAccessTokenState);
     const [authChecked, setAuthChecked] = useRecoilState(authCheckedState);
     const navigate = useNavigate();
 
@@ -20,7 +22,10 @@ export const useSign = () => {
         setUserNo(data.userNo);
         setUserEmail(data.userEmail);
         setUserNickname(data.userNickname);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
+        setAuthChecked(true);
+        const token = `Bearer ${data.accessToken}`;
+        axios.defaults.headers.common["Authorization"] = token;
+        setUserAccessToken(token);
 
         if(stay) {
             window.sessionStorage.removeItem("refreshToken");
@@ -43,9 +48,11 @@ export const useSign = () => {
         setUserNo(null);
         setUserEmail(null);
         setUserNickname(null);
+        setAuthChecked(false);
 
         //axios에 설정된 헤더(Authorization) 제거
         delete axios.defaults.headers.common["Authorization"];
+        setUserAccessToken(null);
 
         //sessionStorage refreshToken 제거
         window.sessionStorage.removeItem("refreshToken");
@@ -76,7 +83,9 @@ export const useSign = () => {
             setUserNo(data.userNo);
             setUserEmail(data.userEmail);
             setUserNickname(data.userNickname);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
+            const token = `Bearer ${data.accessToken}`;
+            axios.defaults.headers.common["Authorization"] = token;
+            setUserAccessToken(token);
 
             if(stay) {
                 window.sessionStorage.removeItem("refreshToken");

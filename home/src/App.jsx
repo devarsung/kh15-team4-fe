@@ -17,6 +17,7 @@ import Invitation from './pages/Invitation';
 
 function App() {
   const {refreshLogin} = useSign();
+
   useEffect(()=>{
     refreshLogin();
   },[]);

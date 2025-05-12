@@ -25,7 +25,7 @@ export default React.memo(function Card(props) {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
-        backgroundColor: createBgColor()
+        // backgroundColor: createBgColor()
     };
 
     const handleModalOpen = useCallback(() => {

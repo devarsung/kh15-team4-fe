@@ -3,11 +3,12 @@ import { FaDatabase, FaDollarSign, FaGear, FaList, FaRightFromBracket, FaRightTo
 import { BsEnvelopePaperFill } from "react-icons/bs";
 import { FaBell } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
-import { userNicknameState } from "../../utils/storage";
-import { useCallback } from "react";
+import { loginState, userNicknameState } from "../../utils/storage";
+import { useCallback, useEffect } from "react";
 import axios from "axios";
 import { useSign } from "../../hooks/useSign";
 import Avatar from "../Avatar";
+import { useWebSocketClient } from "../../hooks/useWebSocketClient";
 
 export default function TopMenu() {
     const { loginRequest, logoutRequest, isLogin } = useSign();
@@ -24,7 +25,6 @@ export default function TopMenu() {
         const stay = false;
         loginRequest(email, pw, stay);
     }, []);
-
     const quickLogin2 = useCallback((e) => {
         e.preventDefault();
         const email = "milkcar777@gmail.com";
@@ -33,6 +33,26 @@ export default function TopMenu() {
         loginRequest(email, pw, stay);
     }, []);
 
+    const { connect, subscribe, disconnect } = useWebSocketClient();
+    useEffect(() => {
+        if (isLogin) {
+            (async () => {
+                try {
+                    await subscribe({
+                        destination: '/private/member/invite',
+                        callback: (msg) => {
+                            toast.info(`초대장 도착: ${msg.content}`);
+                        },
+                    });
+                } catch (error) {
+                    console.error("소켓 연결/구독 실패", error);
+                }
+            })();
+        } else {
+            disconnect();
+        }
+    }, [isLogin, subscribe, disconnect]);
+    
     return (<>
         <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
             <div className="container-fluid">
@@ -87,9 +107,9 @@ export default function TopMenu() {
                     <ul className="navbar-nav ms-auto">
                         {isLogin ? (<>
                             <li className="nav-item d-flex align-items-center">
-                                <Link to="/invitation" className="nav-link d-flex justify-content-center align-items-center position-relative" style={{height:"48px"}}>
-                                    <BsEnvelopePaperFill className="fs-3"/>
-                                    <span className="badge bg-danger position-absolute translate-middle-x" style={{top:"5px", left: "40px"}}>
+                                <Link to="/invitation" className="nav-link d-flex justify-content-center align-items-center position-relative" style={{ height: "48px" }}>
+                                    <BsEnvelopePaperFill className="fs-3" />
+                                    <span className="badge bg-danger position-absolute translate-middle-x" style={{ top: "5px", left: "40px" }}>
                                         1
                                     </span>
                                 </Link>
