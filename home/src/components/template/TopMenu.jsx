@@ -3,7 +3,7 @@ import { FaDatabase, FaDollarSign, FaGear, FaList, FaRightFromBracket, FaRightTo
 import { BsEnvelopePaperFill } from "react-icons/bs";
 import { FaBell } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
-import { loginState, userNicknameState } from "../../utils/storage";
+import { loginState, userNicknameState, userNoState } from "../../utils/storage";
 import { useCallback, useEffect } from "react";
 import axios from "axios";
 import { useSign } from "../../hooks/useSign";
@@ -11,6 +11,7 @@ import Avatar from "../Avatar";
 import { useWebSocketClient } from "../../hooks/useWebSocketClient";
 
 export default function TopMenu() {
+    const userNo = useRecoilValue(userNoState);
     const { loginRequest, logoutRequest, isLogin } = useSign();
     const userNickname = useRecoilValue(userNicknameState);
     const handleLogout = useCallback(async (e) => {
@@ -39,7 +40,7 @@ export default function TopMenu() {
             (async () => {
                 try {
                     await subscribe({
-                        destination: '/private/member/invite',
+                        destination: `/private/invite/${userNo}`,
                         callback: (msg) => {
                             toast.info(`초대장 도착: ${msg.content}`);
                         },

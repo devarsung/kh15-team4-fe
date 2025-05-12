@@ -44,7 +44,7 @@ export default React.memo(function Card(props) {
                         aria-expanded="false">
                         <BsThreeDotsVertical />
                     </button>
-                    <ul className="dropdown-menu dropdown-menu-end dropdown-menu-sm-start">
+                    <ul className="card-dropdown-menu dropdown-menu dropdown-menu-end dropdown-menu-sm-start">
                         <li><a className="dropdown-item" href="#">편집</a></li>
                         <li><a className="dropdown-item" href="#">삭제</a></li>
                     </ul>

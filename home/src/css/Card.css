@@ -49,7 +49,7 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.dropdown-menu {
+.card-dropdown-menu {
     font-size: 0.9rem;
     min-width: 100px;
     z-index: 1050;
