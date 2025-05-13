@@ -51,7 +51,8 @@ export const useWebSocketClient = () => {
         }
 
         const subscription = stompClient.subscribe(destination, (message) => {
-            callback(JSON.parse(message.body));
+            const json = JSON.parse(message.body);
+            callback(json);
         });
 
         subscriptions.push({ destination, subscription });

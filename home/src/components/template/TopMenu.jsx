@@ -4,11 +4,12 @@ import { BsEnvelopePaperFill } from "react-icons/bs";
 import { FaBell } from "react-icons/fa";
 import { useRecoilValue } from "recoil";
 import { loginState, userNicknameState, userNoState } from "../../utils/storage";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSign } from "../../hooks/useSign";
 import Avatar from "../Avatar";
 import { useWebSocketClient } from "../../hooks/useWebSocketClient";
+import { useInvite } from "../../hooks/useInvite";
 
 export default function TopMenu() {
     const userNo = useRecoilValue(userNoState);
@@ -34,25 +35,16 @@ export default function TopMenu() {
         loginRequest(email, pw, stay);
     }, []);
 
-    const { connect, subscribe, disconnect } = useWebSocketClient();
+    const { disconnect } = useWebSocketClient();
+    const {newInvite, inviteSubscribe, unreadInviteCount} = useInvite();
     useEffect(() => {
         if (isLogin) {
-            (async () => {
-                try {
-                    await subscribe({
-                        destination: `/private/invite/${userNo}`,
-                        callback: (msg) => {
-                            toast.info(`초대장 도착: ${msg.content}`);
-                        },
-                    });
-                } catch (error) {
-                    console.error("소켓 연결/구독 실패", error);
-                }
-            })();
+            unreadInviteCount();
+            inviteSubscribe();
         } else {
             disconnect();
         }
-    }, [isLogin, subscribe, disconnect]);
+    }, [isLogin]);
     
     return (<>
         <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
@@ -110,9 +102,10 @@ export default function TopMenu() {
                             <li className="nav-item d-flex align-items-center">
                                 <Link to="/invitation" className="nav-link d-flex justify-content-center align-items-center position-relative" style={{ height: "48px" }}>
                                     <BsEnvelopePaperFill className="fs-3" />
-                                    <span className="badge bg-danger position-absolute translate-middle-x" style={{ top: "5px", left: "40px" }}>
-                                        1
-                                    </span>
+                                    {newInvite && (
+                                            <span className="position-absolute translate-middle-x bg-danger rounded-circle" style={{ top: "5px", left: "40px", width: "10px", height: "10px" }}></span>
+                                    )}
+                                    
                                 </Link>
                             </li>
                             <li className="nav-item dropdown ms-0">

@@ -2,19 +2,22 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSign } from "../hooks/useSign";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import {useInvite} from "../hooks/useInvite";
 
 export default function Invitation() {
     const navigate = useNavigate();
     const { isLogin } = useSign();
+    
     const [inviteList, setInviteList] = useState([]);
-
+    const {readInvite} = useInvite();
     useEffect(() => {
         if (isLogin === false) return;
+        readInvite();
         loadInviteList();
     }, [isLogin]);
 
     const loadInviteList = useCallback(async () => {
-        const { data } = await axios.get(`/board/invite`);
+        const { data } = await axios.get(`/invite/`);
         setInviteList(data);
     }, []);
 
@@ -30,7 +33,7 @@ export default function Invitation() {
                         <div className="list-group-item" key={invite.boardInviteNo}>
                             <div className="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{invite.accountNickname}</strong>님이
+                                    <strong>{invite.accountNickname}</strong>님이&nbsp;
                                     <strong>{invite.boardTitle}</strong>에 초대했습니다.
                                 </div>
                                 <div>
