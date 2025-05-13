@@ -35,17 +35,22 @@ export default function TopMenu() {
         loginRequest(email, pw, stay);
     }, []);
 
-    const { disconnect } = useWebSocketClient();
-    const {newInvite, inviteSubscribe, unreadInviteCount} = useInvite();
+    const { disconnect, unsubscribe } = useWebSocketClient();
+    const { newInvite, inviteSubscribe, unreadInviteCount } = useInvite();
     useEffect(() => {
         if (isLogin) {
             unreadInviteCount();
             inviteSubscribe();
         } else {
             disconnect();
+            unsubscribe(`/private/invite/${userNo}`);
         }
+
+        return () => {
+            unsubscribe(`/private/invite/${userNo}`);
+        };
     }, [isLogin]);
-    
+
     return (<>
         <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
             <div className="container-fluid">
@@ -103,9 +108,9 @@ export default function TopMenu() {
                                 <Link to="/invitation" className="nav-link d-flex justify-content-center align-items-center position-relative" style={{ height: "48px" }}>
                                     <BsEnvelopePaperFill className="fs-3" />
                                     {newInvite && (
-                                            <span className="position-absolute translate-middle-x bg-danger rounded-circle" style={{ top: "5px", left: "40px", width: "10px", height: "10px" }}></span>
+                                        <span className="position-absolute translate-middle-x bg-danger rounded-circle" style={{ top: "5px", left: "40px", width: "10px", height: "10px" }}></span>
                                     )}
-                                    
+
                                 </Link>
                             </li>
                             <li className="nav-item dropdown ms-0">

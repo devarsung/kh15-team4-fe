@@ -57,7 +57,21 @@ export const useWebSocketClient = () => {
 
         subscriptions.push({ destination, subscription });
         console.log(`${destination} 구독 완료`);
+        return subscription;
     }, [connect]);
+
+    const unsubscribe = useCallback((destination) => {
+        const index = subscriptions.findIndex((sub)=>sub.destination === destination);
+
+        if(index !== -1) {
+            subscriptions[index].subscription.unsubscribe();
+            subscriptions.splice(index, 1);
+            console.log(`${destination} 구독 해제`);
+        }
+        else {
+            console.log(`${destination} 라는 구독이 존재하지 않습니다`);
+        }
+    }, []);
 
     const disconnect = useCallback(() => {
         if (stompClient) {
@@ -89,5 +103,5 @@ export const useWebSocketClient = () => {
         };
     }, []);
 
-    return { connect, subscribe, disconnect, publish };
+    return { connect, subscribe, unsubscribe, disconnect, publish };
 };

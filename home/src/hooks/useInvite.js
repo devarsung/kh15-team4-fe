@@ -12,16 +12,18 @@ export const useInvite = () => {
 
     const inviteSubscribe = useCallback(async () => {
         try {
-            await subscribe({
+             const subscription = await subscribe({
                 destination: `/private/invite/${userNo}`,
                 callback: (result) => {
                     setNewInvite(result.hasInvitation);
                     console.log("초대장");
                 },
             });
+
+            return subscription;
         } catch (error) {
             console.error("소켓 연결/구독 실패", error);
-        }
+        }        
     }, [userNo]);
 
     const unreadInviteCount = useCallback(async () => {
