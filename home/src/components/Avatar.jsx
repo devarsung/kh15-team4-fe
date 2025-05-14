@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 export default function Avatar(props) {
-    const { nickname = '', size = 80 } = props;
+    const { nickname = '', size = 80, classes } = props;
     const [initials, setInitials] = useState("");
     const [bgColor, setBgColor] = useState("");
 
@@ -35,7 +35,7 @@ export default function Avatar(props) {
 
     return (<>
         <div
-            // className="rounded-circle"
+            className={classes}
             style={{
                 width: size,
                 height: size,

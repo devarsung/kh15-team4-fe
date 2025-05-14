@@ -2,22 +2,28 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSign } from "../hooks/useSign";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import {useInvite} from "../hooks/useInvite";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userNoState } from "../utils/storage";
+import { newInviteState } from "../utils/intive";
 
 export default function Invitation() {
     const navigate = useNavigate();
     const { isLogin } = useSign();
     const userNo = useRecoilValue(userNoState);
+    const [newInvite, setNewInvite] = useRecoilState(newInviteState);
     
     const [inviteList, setInviteList] = useState([]);
-    const {readInvite} = useInvite();
     useEffect(() => {
         if (isLogin === false) return;
         readInvite();
         loadInviteList();
     }, [isLogin]);
+
+    const readInvite = useCallback(async ()=>{
+        if(newInvite === false) {return;}
+        await axios.get(`/invite/readInvite`);
+        setNewInvite(false);
+    },[newInvite]);
 
     const loadInviteList = useCallback(async () => {
         const { data } = await axios.post(`/invite/list`, {receiverNo: userNo, boardInviteStatus: "PENDING"});

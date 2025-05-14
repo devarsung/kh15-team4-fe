@@ -1,18 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaDatabase, FaDollarSign, FaGear, FaList, FaRightFromBracket, FaRightToBracket, FaUser } from "react-icons/fa6";
 import { BsEnvelopePaperFill } from "react-icons/bs";
-import { FaBell } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
-import { loginState, userNicknameState, userNoState } from "../../utils/storage";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { loginState, userAccessTokenState, userNicknameState, userNoState } from "../../utils/storage";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSign } from "../../hooks/useSign";
 import Avatar from "../Avatar";
-import { useInvite } from "../../hooks/useInvite";
-import {connectWebSocket,subscribeWebSocket,unsubscribeWebSocket,publishWebSocket,disconnectWebSocket} from "../../utils/webSocketClient.js"
+import { connectWebSocket, subscribeWebSocket, unsubscribeWebSocket, disconnectWebSocket } from "../../utils/webSocketClient.js"
+import { newInviteState } from "../../utils/intive";
 
 export default function TopMenu() {
     const userNo = useRecoilValue(userNoState);
+    const userAccessToken = useRecoilValue(userAccessTokenState);
     const { loginRequest, logoutRequest, isLogin } = useSign();
     const userNickname = useRecoilValue(userNicknameState);
     const handleLogout = useCallback(async (e) => {
@@ -35,7 +35,7 @@ export default function TopMenu() {
         loginRequest(email, pw, stay);
     }, []);
 
-    const { newInvite, inviteSubscribe, unreadInviteCount } = useInvite();
+    const [newInvite, setNewInvite] = useRecoilState(newInviteState);
     useEffect(() => {
         if (isLogin) {
             unreadInviteCount();
@@ -49,6 +49,22 @@ export default function TopMenu() {
             unsubscribeWebSocket(`/private/invite/${userNo}`);
         };
     }, [isLogin]);
+
+    const inviteSubscribe = useCallback(async () => {
+        connectWebSocket(userAccessToken).then(() => {
+            const destination = `/private/invite/${userNo}`;
+            const callback = (result) => {
+                setNewInvite(result.hasInvitation);
+            };
+
+            subscribeWebSocket(destination, callback, userAccessToken);
+        });
+    }, [userNo, userAccessToken]);
+
+    const unreadInviteCount = useCallback(async () => {
+        const { data } = await axios.get(`/invite/unreadInviteCount`);
+        setNewInvite(data > 0);
+    }, []);
 
     return (<>
         <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">

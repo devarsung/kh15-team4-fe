@@ -11,13 +11,15 @@ import Card from "./Card";
 import { useKanban } from "../hooks/useKanban";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
-import CardModal from "./CardModal";
-import { useBoard } from "../hooks/useBoard";
+import { connectWebSocket, subscribeWebSocket, unsubscribeWebSocket } from '../utils/webSocketClient.js';
+import { userAccessTokenState } from "../utils/storage.js";
+import { useRecoilValue } from "recoil";
 
 export default function Board() {
     const { convertToMap, createLane, updateLaneOrder,
         updateCardOrder, updateCardOrderBetween, moveBetweenLanes } = useKanban();
 
+    const navigate = useNavigate();
     const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
     const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } });
     const sensors = useSensors(mouseSensor, touchSensor);
@@ -32,16 +34,46 @@ export default function Board() {
     const [laneIdList, setLaneIdList] = useState([]);
     const [activeDragInfo, setActiveDragInfo] = useState(null);
 
-    
-    const {usersSubscribe, updateSubscribe, selectLaneFullList} = useBoard(boardNo);
+    const [headerLoading, setHeaderLoading] = useState(false);
+    const userAccessToken = useRecoilValue(userAccessTokenState);
+
     useEffect(() => {
-        const init = async()=>{
-            await loadData();
-            usersSubscribe(boardNo);
-            updateSubscribe(boardNo);
+        //참여자인지 아닌지 확인
+        canAccessBoard().then(resp => {
+            if (resp === true) {
+                const init = async () => {
+                    await loadData();
+                    updateSubscribe(boardNo);
+                    setHeaderLoading(true);
+                };
+                init();
+            }
+            else {
+                navigate("/myWorkSpace");
+            }
+        });
+
+        return () => {
+            unsubscribeWebSocket(`/private/users/${boardNo}`);
+            unsubscribeWebSocket(`/private/update/${boardNo}`);
         };
-        init();
     }, [boardNo]);
+
+    const canAccessBoard = useCallback(async () => {
+        const { data } = await axios.get(`/board/member/${boardNo}`);
+        return data;
+    }, [boardNo]);
+
+    //보드 업데이트 채널 구독
+    const updateSubscribe = useCallback(async (boardNo) => {
+        connectWebSocket(userAccessToken).then(() => {
+            const destination = `/private/update/${boardNo}`;
+            const callback = (result) => {
+                console.log("업데이트는");
+            };
+            subscribeWebSocket(destination, callback, userAccessToken);
+        });
+    }, [userAccessToken]);
 
     const loadData = useCallback(async () => {
         const data = await selectLaneFullList(boardNo);
@@ -49,6 +81,12 @@ export default function Board() {
         setLaneMap(convertData.lanes);
         setCardMap(convertData.cards);
         setLaneIdList(convertData.laneIds);
+    }, []);
+
+    //레인,카드 데이터 비동기로 가져오기
+    const selectLaneFullList = useCallback(async (boardNo) => {
+        const { data } = await axios.get(`/lane/lanefull/${boardNo}`);
+        return data;
     }, []);
 
     const getCardMapInLane = useCallback((laneId) => {
@@ -207,7 +245,7 @@ export default function Board() {
     }, [boardNo, laneTitle]);
 
     return (<>
-        <BoardHeader boardNo={boardNo} />
+        {headerLoading && (<BoardHeader boardNo={boardNo} />)}
 
         <div className="kanban-board">
             <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}
