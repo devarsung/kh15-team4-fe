@@ -5,7 +5,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import "../css/Card.css";
 
 export default React.memo(function Card(props) {
-    const { id, card, laneNo, laneId, openModal } = props;
+    const { id, card, laneNo, laneId } = props;
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
@@ -28,13 +28,9 @@ export default React.memo(function Card(props) {
         // backgroundColor: createBgColor()
     };
 
-    const handleModalOpen = useCallback(() => {
-        openModal(card.cardNo);
-    }, [card]);
-
     return (<>
         <div className="kanban-card" ref={setNodeRef} style={style} 
-            {...listeners} {...attributes} onClick={handleModalOpen}>
+            {...listeners} {...attributes}>
             <div className="card-header">
                 <div className="form-check form-check-custom">
                     <input className="form-check-input rounded-circle" type="checkbox"/>
@@ -45,8 +41,10 @@ export default React.memo(function Card(props) {
                         <BsThreeDotsVertical />
                     </button>
                     <ul className="card-dropdown-menu dropdown-menu dropdown-menu-end dropdown-menu-sm-start">
-                        <li><a className="dropdown-item" href="#">편집</a></li>
-                        <li><a className="dropdown-item" href="#">삭제</a></li>
+                        <li><a className="dropdown-item" href="#"><span>수정</span></a></li>
+                        <li><a className="dropdown-item" href="#"><span>색상</span></a></li>
+                        <li><a className="dropdown-item" href="#"><span>멤버</span></a></li>
+                        <li><a className="dropdown-item" href="#"><span>삭제</span></a></li>
                     </ul>
                 </div>
             </div>

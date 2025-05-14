@@ -68,6 +68,6 @@ export const useKanban = () => {
         await axios.post(`/card/${laneNo}`, {cardTitle: cardTitle});
     };
 
-    return { convertToMap, createLane, deleteLane, selectLaneFullList, updateLaneOrder, 
+    return { convertToMap, createLane, deleteLane, updateLaneOrder, 
             updateCardOrder, updateCardOrderBetween, moveBetweenLanes, createCard };
 };

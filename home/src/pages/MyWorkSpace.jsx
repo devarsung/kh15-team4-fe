@@ -22,7 +22,6 @@ export default function MyWorkSpace() {
 
     const loadData = useCallback(async () => {
         const { data } = await axios.get(`/board/`);
-        console.log(data);
         setMyBoardList(data.boardList);
         setGuestBoardList(data.guestBoardList);
     }, []);

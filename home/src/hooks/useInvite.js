@@ -1,29 +1,24 @@
 import axios from "axios";
 import { useCallback, useState } from "react";
-import { useWebSocketClient } from "./useWebSocketClient";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {newInviteState} from "../utils/intive";
-import { userNoState } from "../utils/storage";
+import { userAccessTokenState, userNoState } from "../utils/storage";
+import {connectWebSocket,subscribeWebSocket,unsubscribeWebSocket,publishWebSocket,disconnectWebSocket} from '../utils/webSocketClient.js';
 
 export const useInvite = () => {
-    const { connect, subscribe, disconnect } = useWebSocketClient();
     const userNo = useRecoilValue(userNoState);
+    const userAccessToken = useRecoilValue(userAccessTokenState);
     const [newInvite, setNewInvite] = useRecoilState(newInviteState);
 
     const inviteSubscribe = useCallback(async () => {
-        try {
-             const subscription = await subscribe({
-                destination: `/private/invite/${userNo}`,
-                callback: (result) => {
-                    setNewInvite(result.hasInvitation);
-                    console.log("초대장");
-                },
-            });
+        connectWebSocket(userAccessToken);
+        const destination = `/private/invite/${userNo}`;
+        const callback = (result) => {
+            setNewInvite(result.hasInvitation);
+            console.log("초대장");
+        };
 
-            return subscription;
-        } catch (error) {
-            console.error("소켓 연결/구독 실패", error);
-        }        
+        subscribeWebSocket(destination, callback);     
     }, [userNo]);
 
     const unreadInviteCount = useCallback(async () => {

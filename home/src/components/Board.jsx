@@ -9,13 +9,13 @@ import Lane from "./Lane";
 import axios from "axios";
 import Card from "./Card";
 import { useKanban } from "../hooks/useKanban";
-import { useModal } from "../hooks/useModal";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import CardModal from "./CardModal";
+import { useBoard } from "../hooks/useBoard";
 
 export default function Board() {
-    const { convertToMap, createLane, selectLaneFullList, updateLaneOrder,
+    const { convertToMap, createLane, updateLaneOrder,
         updateCardOrder, updateCardOrderBetween, moveBetweenLanes } = useKanban();
 
     const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } });
@@ -32,11 +32,16 @@ export default function Board() {
     const [laneIdList, setLaneIdList] = useState([]);
     const [activeDragInfo, setActiveDragInfo] = useState(null);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
+    
+    const {usersSubscribe, updateSubscribe, selectLaneFullList} = useBoard(boardNo);
     useEffect(() => {
-        loadData();
-    }, []);
+        const init = async()=>{
+            await loadData();
+            usersSubscribe(boardNo);
+            updateSubscribe(boardNo);
+        };
+        init();
+    }, [boardNo]);
 
     const loadData = useCallback(async () => {
         const data = await selectLaneFullList(boardNo);
@@ -201,9 +206,6 @@ export default function Board() {
         setLaneCreateMode(false);
     }, [boardNo, laneTitle]);
 
-    //모달
-    const { isOpen, openModal, closeModal, cardData } = useModal();
-
     return (<>
         <BoardHeader boardNo={boardNo} />
 
@@ -215,7 +217,7 @@ export default function Board() {
                 <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
                     {laneIdList.map(laneId => (
                         <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
-                            loadData={loadData} openModal={openModal}></Lane>
+                            loadData={loadData}></Lane>
                     ))}
                 </SortableContext>
 
@@ -246,6 +248,5 @@ export default function Board() {
             </div>
         </div>
 
-        <CardModal isOpen={isOpen} cardData={cardData} closeModal={closeModal}></CardModal>
     </>)
 }

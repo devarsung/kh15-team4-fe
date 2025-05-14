@@ -31,8 +31,8 @@ export default function LaneHeader(props) {
                     <BsThreeDotsVertical/>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-end dropdown-menu-sm-start">
-                    <li><a className="dropdown-item" href="#"><FaEdit/>수정</a></li>
-                    <li><a className="dropdown-item" href="#" onClick={handleDeleteLane}><FaTrashAlt/>삭제</a></li>
+                    <li><a className="dropdown-item" href="#"><FaEdit/><span className="ms-2">수정</span></a></li>
+                    <li><a className="dropdown-item" href="#" onClick={handleDeleteLane}><FaTrashAlt/><span className="ms-2">삭제</span></a></li>
                 </ul>
             </div>
         </div>

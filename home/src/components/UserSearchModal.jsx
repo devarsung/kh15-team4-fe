@@ -4,7 +4,6 @@ import { throttle, debounce } from "lodash";
 import axios from 'axios';
 import Avatar from './Avatar';
 import { toast } from 'react-toastify';
-import { useWebSocketClient } from '../hooks/useWebSocketClient';
 
 export default function UserSearchModal(props) {
     const { isOpen, closeModal, boardNo } = props;
@@ -16,8 +15,6 @@ export default function UserSearchModal(props) {
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
     const [last, setLast] = useState(true);
-
-    const { publish } = useWebSocketClient();
 
     useEffect(() => {
         searchUsers(keyword);

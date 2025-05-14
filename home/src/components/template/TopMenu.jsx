@@ -8,8 +8,8 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSign } from "../../hooks/useSign";
 import Avatar from "../Avatar";
-import { useWebSocketClient } from "../../hooks/useWebSocketClient";
 import { useInvite } from "../../hooks/useInvite";
+import {connectWebSocket,subscribeWebSocket,unsubscribeWebSocket,publishWebSocket,disconnectWebSocket} from "../../utils/webSocketClient.js"
 
 export default function TopMenu() {
     const userNo = useRecoilValue(userNoState);
@@ -35,19 +35,18 @@ export default function TopMenu() {
         loginRequest(email, pw, stay);
     }, []);
 
-    const { disconnect, unsubscribe } = useWebSocketClient();
     const { newInvite, inviteSubscribe, unreadInviteCount } = useInvite();
     useEffect(() => {
         if (isLogin) {
             unreadInviteCount();
             inviteSubscribe();
         } else {
-            disconnect();
-            unsubscribe(`/private/invite/${userNo}`);
+            disconnectWebSocket();
+            unsubscribeWebSocket(`/private/invite/${userNo}`);
         }
 
         return () => {
-            unsubscribe(`/private/invite/${userNo}`);
+            unsubscribeWebSocket(`/private/invite/${userNo}`);
         };
     }, [isLogin]);
 
