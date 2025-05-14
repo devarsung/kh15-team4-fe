@@ -40,22 +40,27 @@ export default function UserSearchModal(props) {
     }, []);
 
     const inviteRequest = useCallback(async (target) => {
-        console.log(boardNo, target.accountNo);
-        const messageData = {
-            destination: `/app/invite`,
-            object: {
-                boardNo: boardNo,
-                receiverNo: target.accountNo
+        // const messageData = {
+        //     destination: `/app/invite`,
+        //     object: {
+        //         boardNo: boardNo,
+        //         receiverNo: target.accountNo
+        //     }
+        // };
+        // publish(messageData);
+        try {
+            const {data} = await axios.post(`/invite/`, { boardNo: boardNo, receiverNo: target.accountNo });
+            if(data.type === "success") {
+                toast.success(data.statusMessage);
             }
-        };
-        publish(messageData);
-        // try {
-        //     await axios.post(`/board/invite`, { boardNo: boardNo, receiverNo: target.accountNo });
-        //     toast.success("초대신청을 보냈습니다");
-        // }
-        // catch (e) {
-        //     toast.error("오류가 발생했습니다. 잠시후 다시 시도하세요");
-        // }
+            else if(data.type === "warning") {
+                toast.warning(data.statusMessage);
+            }
+            
+        }
+        catch (e) {
+            toast.error("오류가 발생했습니다. 잠시후 다시 시도하세요");
+        }
     }, [boardNo]);
 
     return (<>

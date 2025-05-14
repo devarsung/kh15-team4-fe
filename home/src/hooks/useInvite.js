@@ -29,12 +29,15 @@ export const useInvite = () => {
     const unreadInviteCount = useCallback(async () => {
         const { data } = await axios.get(`/invite/unreadInviteCount`);
         setNewInvite(data > 0);
-    }, []);
+    }, [newInvite]);
 
     const readInvite = useCallback(async ()=>{
-        const {data} = await axios.get(`/invite/readInvite`);
+        if(newInvite === false) {
+            return;
+        }
+        await axios.get(`/invite/readInvite`);
         setNewInvite(false);
-    },[]);
+    },[newInvite]);
 
     return {
         newInvite, inviteSubscribe, unreadInviteCount, readInvite

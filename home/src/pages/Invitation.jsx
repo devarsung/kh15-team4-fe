@@ -25,12 +25,13 @@ export default function Invitation() {
     }, []);
 
     const acceptInvite = useCallback(async(target)=>{
-        await axios.patch(`/invite/accept`, {boardInviteNo: target.boardInviteNo});
+        await axios.patch(`/invite/accept`, target);
         loadInviteList();
     },[]);
 
     const rejectInvite = useCallback(async(target)=>{
-        await axios.patch(`/invite/reject`, {boardInviteNo: target.boardInviteNo});
+        console.log(target);
+        await axios.patch(`/invite/reject`, target);
         loadInviteList();
     },[]);
 
