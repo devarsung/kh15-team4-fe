@@ -5,10 +5,11 @@ import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import "../css/MyWorkSpace.css";
 import { useSign } from "../hooks/useSign";
+import { LiaUserEditSolid } from "react-icons/lia";
 
 export default function MyWorkSpace() {
     const navigate = useNavigate();
-    const {isLogin} = useSign();
+    const { isLogin } = useSign();
     const [myBoardList, setMyBoardList] = useState([]);
     const [guestBoardList, setGuestBoardList] = useState([]);
     const [createMode, setCreateMode] = useState(false);
@@ -21,8 +22,9 @@ export default function MyWorkSpace() {
 
     const loadData = useCallback(async () => {
         const { data } = await axios.get(`/board/`);
-        setMyBoardList(data);
-        //setGuestBoardList(data.guestBoardList);
+        console.log(data);
+        setMyBoardList(data.boardList);
+        setGuestBoardList(data.guestBoardList);
     }, []);
 
     const createBoard = useCallback(async () => {
@@ -49,7 +51,7 @@ export default function MyWorkSpace() {
                 <div className="row row-cols-2 row-cols-md-4 g-4">
                     {myBoardList.map(board => (
                         <div className="col" key={board.boardNo}>
-                            <button className="btn btn-outline-secondary btn-workspace"
+                            <button className="btn btn-outline-secondary btn-workspace fw-bold fs-5"
                                 onClick={e => goToBoardDetail(board)}>
                                 {board.boardTitle}
                             </button>
@@ -60,8 +62,8 @@ export default function MyWorkSpace() {
                     <div className="col">
                         {createMode === true ? (
                             <div className="border rounded h-100 d-flex flex-column justify-content-between p-3 bg-light">
-                                <input type="text" className="form-control" placeholder="Enter Board Title..." 
-                                    value={boardTitle} onChange={e => setBoardTitle(e.target.value)}/>
+                                <input type="text" className="form-control" placeholder="Enter Board Title..."
+                                    value={boardTitle} onChange={e => setBoardTitle(e.target.value)} />
                                 <div className="mt-3">
                                     <button className="btn btn-sm btn-primary w-50 me-1" onClick={createBoard}>Create</button>
                                     <button className="btn btn-sm btn-outline-secondary ms-1" onClick={e => { setBoardTitle(""); setCreateMode(false); }}><FaXmark /></button>
@@ -84,9 +86,14 @@ export default function MyWorkSpace() {
                     <div className="row row-cols-2 row-cols-md-4 g-4">
                         {guestBoardList.map(board => (
                             <div className="col" key={board.boardNo}>
-                                <button className="btn btn-outline-success btn-workspace"
-                                    onClick={e => goToBoardDetail(board)}>
-                                    {board.boardTitle}
+                                <button className="btn btn-outline-success btn-workspace position-relative w-100" style={{ height: '100px' }} onClick={e => goToBoardDetail(board)}>
+                                    <div className="position-absolute top-50 start-50 translate-middle fw-bold fs-5 text-center">
+                                        {board.boardTitle}
+                                    </div>
+                                    <div className="position-absolute bottom-0 end-0 mb-1 me-2 text-muted">
+                                        <LiaUserEditSolid className="fs-5"/> 
+                                        <span>{board.accountNickname}</span>
+                                    </div>
                                 </button>
                             </div>
                         ))}
