@@ -36,6 +36,7 @@ export default function Board() {
 
     const [headerLoading, setHeaderLoading] = useState(false);
     const userAccessToken = useRecoilValue(userAccessTokenState);
+    const subIdRef = useRef(null);
 
     useEffect(() => {
         //참여자인지 아닌지 확인
@@ -43,7 +44,7 @@ export default function Board() {
             if (resp === true) {
                 const init = async () => {
                     await loadData();
-                    updateSubscribe(boardNo);
+                    await updateSubscribe(boardNo);
                     setHeaderLoading(true);
                 };
                 init();
@@ -54,8 +55,10 @@ export default function Board() {
         });
 
         return () => {
-            unsubscribeWebSocket(`/private/users/${boardNo}`);
-            unsubscribeWebSocket(`/private/update/${boardNo}`);
+            if(subIdRef.current) {
+                unsubscribeWebSocket(`/private/update/${boardNo}`);
+                subIdRef.current = null;
+            }
         };
     }, [boardNo]);
 
@@ -66,13 +69,13 @@ export default function Board() {
 
     //보드 업데이트 채널 구독
     const updateSubscribe = useCallback(async (boardNo) => {
-        connectWebSocket(userAccessToken).then(() => {
-            const destination = `/private/update/${boardNo}`;
-            const callback = (result) => {
-                console.log("업데이트는");
-            };
-            subscribeWebSocket(destination, callback, userAccessToken);
-        });
+        await connectWebSocket(userAccessToken);
+        const destination = `/private/update/${boardNo}`;
+        const callback = (result) => {
+            console.log("업데이트는");
+        };
+        const subId = await subscribeWebSocket(destination, callback, userAccessToken);
+        subIdRef.current = subId;
     }, [userAccessToken]);
 
     const loadData = useCallback(async () => {

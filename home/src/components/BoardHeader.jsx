@@ -1,12 +1,12 @@
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { FaUsers } from "react-icons/fa";
 import { BsFillPencilFill, BsFillPersonPlusFill, BsThreeDotsVertical, BsFillTrash3Fill } from "react-icons/bs"
 import UserSearchModal from "./UserSearchModal";
 import { useModal } from "../hooks/useModal";
 import Avatar from "./Avatar";
 import * as bootstrap from 'bootstrap';
-import { connectWebSocket, subscribeWebSocket } from '../utils/webSocketClient.js';
+import { connectWebSocket, subscribeWebSocket, unsubscribeWebSocket } from '../utils/webSocketClient.js';
 import { userAccessTokenState } from "../utils/storage.js";
 import { useRecoilValue } from "recoil";
 
@@ -17,12 +17,21 @@ export default function BoardHeader(props) {
     const { isOpen, openModal, closeModal } = useModal();
     const userAccessToken = useRecoilValue(userAccessTokenState);
 
+    const subIdRef = useRef(null);
+
     useEffect(() => {
         const init = async () => {
             await loadBoardInfo();
-            usersSubscribe(boardNo);
+            await usersSubscribe(boardNo);
         };
         init();
+
+        return () => {
+            if (subIdRef.current) {
+                unsubscribeWebSocket(subIdRef.current);
+                subIdRef.current = null;
+            }
+        };
     }, [boardNo]);
 
     useEffect(() => {
@@ -32,13 +41,13 @@ export default function BoardHeader(props) {
 
     //접속자 채널 구독
     const usersSubscribe = useCallback(async (boardNo) => {
-        connectWebSocket(userAccessToken).then(() => {
-            const destination = `/private/users/${boardNo}`;
-            const callback = (result) => {
-                setUserList(result);
-            };
-            subscribeWebSocket(destination, callback, userAccessToken);
-        });
+        await connectWebSocket(userAccessToken);
+        const destination = `/private/users/${boardNo}`;
+        const callback = (result) => {
+            setUserList(result);
+        };
+        const subId = await subscribeWebSocket(destination, callback, userAccessToken);
+        subIdRef.current = subId; // 구독 ID 저장
     }, [userAccessToken]);
 
     const loadBoardInfo = useCallback(async () => {

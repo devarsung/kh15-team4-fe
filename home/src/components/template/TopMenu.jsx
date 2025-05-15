@@ -3,7 +3,7 @@ import { FaDatabase, FaDollarSign, FaGear, FaList, FaRightFromBracket, FaRightTo
 import { BsEnvelopePaperFill } from "react-icons/bs";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { loginState, userAccessTokenState, userNicknameState, userNoState } from "../../utils/storage";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useSign } from "../../hooks/useSign";
 import Avatar from "../Avatar";
@@ -36,29 +36,40 @@ export default function TopMenu() {
     }, []);
 
     const [newInvite, setNewInvite] = useRecoilState(newInviteState);
+    const subIdRef = useRef(null);
     useEffect(() => {
         if (isLogin) {
             unreadInviteCount();
             inviteSubscribe();
         } else {
+            if (subIdRef.current) {
+                unsubscribeWebSocket(subIdRef.current);
+                subIdRef.current = null;
+            }
             disconnectWebSocket();
-            unsubscribeWebSocket(`/private/invite/${userNo}`);
         }
 
         return () => {
-            unsubscribeWebSocket(`/private/invite/${userNo}`);
+            if (subIdRef.current) {
+                unsubscribeWebSocket(subIdRef.current);
+                subIdRef.current = null;
+            }
         };
-    }, [isLogin]);
+    }, [isLogin, userNo, userAccessToken]);
 
     const inviteSubscribe = useCallback(async () => {
-        connectWebSocket(userAccessToken).then(() => {
+        try {
+            await connectWebSocket(userAccessToken);
             const destination = `/private/invite/${userNo}`;
             const callback = (result) => {
                 setNewInvite(result.hasInvitation);
             };
 
-            subscribeWebSocket(destination, callback, userAccessToken);
-        });
+            const subId = await subscribeWebSocket(destination, callback, userAccessToken);
+            subIdRef.current = subId;
+        } catch (error) {
+            console.error("WebSocket 연결 혹은 구독 실패:", error);
+        }
     }, [userNo, userAccessToken]);
 
     const unreadInviteCount = useCallback(async () => {
