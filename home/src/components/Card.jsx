@@ -4,9 +4,10 @@ import { CSS } from "@dnd-kit/utilities"
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "../css/Card.css";
 import { useKanban } from "../hooks/useKanban";
+import Avatar from "./Avatar";
 
 export default React.memo(function Card(props) {
-    const { id, card, laneNo, laneId, boardNo, palette } = props;
+    const { id, card, laneNo, laneId, boardNo, palette, memberList } = props;
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
@@ -25,8 +26,11 @@ export default React.memo(function Card(props) {
         backgroundColor: card.cardColor,
     };
 
+    const [isCheck, setIsCheck] = useState(card.cardComplete === 'Y');
     const [showPalette, setShowPalette] = useState(false);
     const [hoveredColor, setHoveredColor] = useState(null);
+    const [showMembers, setShowMembers] = useState(false);
+
     useEffect(() => {
         const dropdown = document.getElementById(`dropdown-${card.cardNo}`);
         const handleHide = () => setShowPalette(false);
@@ -48,7 +52,10 @@ export default React.memo(function Card(props) {
             <div className="card-header">
                 <div className="form-check form-check-custom">
                     <input className="form-check-input rounded-circle" type="checkbox" 
-                        checked={card.cardComplete === 'Y' ? true : false} readOnly/>
+                        checked={isCheck} onChange={e=>{
+                            setIsCheck(e.target.checked);
+                            const newValue = e.target.checked ? 'Y' : 'N';
+                        }}/>
                 </div>
                 <div className="dropdown" data-bs-auto-close="outside">
                     <button className="btn border-0 bg-transparent text-dark btn-more dropdown-toggle p-0" type="button" 
@@ -67,14 +74,11 @@ export default React.memo(function Card(props) {
                                 e.preventDefault(); e.stopPropagation(); setShowPalette(!showPalette); }}>
                                 <span>색상</span>
                             </a>
-                         
                             {showPalette && (
                                 <div className="color-palette">
                                     <div className="colors">
                                         {palette.map(color => (
-                                            <div
-                                                key={color.colorCode}
-                                                className="color-button"
+                                            <div key={color.colorCode} className="color-button"
                                                 style={{ backgroundColor: color.colorCode }}
                                                 onMouseEnter={() => setHoveredColor(color.colorName)}
                                                 onMouseLeave={() => setHoveredColor(null)}
@@ -92,9 +96,27 @@ export default React.memo(function Card(props) {
                         </li>
                         <li>
                             <a type="button" className="dropdown-item" onClick={e => {
-                                e.preventDefault(); e.stopPropagation();}}>
+                                e.preventDefault(); e.stopPropagation(); setShowMembers(!showMembers); }}>
                                 <span>멤버</span>
                             </a>
+                            {showMembers && (
+                                <div className="color-palette">
+                                    <div className="colors">
+                                        {memberList.map(member => (<>
+                                            <Avatar key={member.accountNo} 
+                                                nickname={member.accountNickname}
+                                                size={32}
+                                                onClick={e => {
+                                                    e.preventDefault(); e.stopPropagation();
+                                                    alert(`${member.accountNickname} 선택됨`);}}
+                                            />
+                                        </>))}
+                                    </div>
+                                    <div className="member-label">
+                                        {hoveredColor ? `색상명: ${hoveredColor}` : "색상을 선택하세요"}
+                                    </div>
+                                </div>
+                            )}
                         </li>
                         <li>
                             <button type="button" className="dropdown-item" onClick={e => {

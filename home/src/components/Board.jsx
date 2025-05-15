@@ -36,6 +36,7 @@ export default function Board() {
 
     const [headerLoading, setHeaderLoading] = useState(false);
     const [palette, setPalette] = useState([]);
+    const [memberList, setMemberList] = useState([]);
 
     const userAccessToken = useRecoilValue(userAccessTokenState);
     const subIdRef = useRef(null);
@@ -75,7 +76,6 @@ export default function Board() {
         const destination = `/private/update/${boardNo}`;
         const callback = (result) => {
             const convertData = convertToMap(result);
-            //console.log("변환 후", convertData);
             setLaneMap(() => ({ ...convertData.lanes }));
             setCardMap(() => ({ ...convertData.cards }));
             setLaneIdList(() => [...convertData.laneIds]);
@@ -95,6 +95,10 @@ export default function Board() {
         //컬러 정보도 불러오기
         const colors = await reuqestColors();
         setPalette(colors);
+
+        //멤버 정보도 불러오기
+        const members = await requestMembers();
+        setMemberList(members);
     }, [boardNo]);
 
     //레인,카드 데이터 비동기로 가져오기
@@ -108,6 +112,12 @@ export default function Board() {
         const {data} = await axios.get(`/color/`);
         return data;
     },[]);
+
+    //이 보드의 멤버 목록 불러오기
+    const requestMembers = useCallback(async ()=>{
+        const {data} = await axios.get(`/board/members/${boardNo}`);
+        return data;
+    },[boardNo]);
 
     const getCardMapInLane = useCallback((laneId) => {
         const map = {};
@@ -276,7 +286,7 @@ export default function Board() {
                 <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
                     {laneIdList.map(laneId => (
                         <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
-                            boardNo={boardNo} palette={palette}></Lane>
+                            boardNo={boardNo} palette={palette} memberList={memberList}></Lane>
                     ))}
                 </SortableContext>
 
