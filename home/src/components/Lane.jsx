@@ -12,7 +12,7 @@ import "../css/Lane.css";
 
 export default React.memo(function Lane(props) {
     const { createCard } = useKanban();
-    const { id, lane, cardMapInLane, loadData } = props;
+    const { id, lane, cardMapInLane, boardNo } = props;
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
@@ -30,11 +30,10 @@ export default React.memo(function Lane(props) {
     const [cardTitle, setCardTitle] = useState("");
 
     const handleCreateCard = useCallback(async () => {
-        await createCard(lane.laneNo, cardTitle);
-        await loadData(lane.boardNo);
+        await createCard(boardNo, lane.laneNo, cardTitle);
         setCardTitle("");
         setCardCreateMode(false);
-    }, [lane, cardTitle]);
+    }, [boardNo, lane, cardTitle]);
 
     useEffect(() => {
     }, []);
@@ -42,14 +41,13 @@ export default React.memo(function Lane(props) {
     return (<>
         <div className="kanban-lane" ref={setNodeRef} style={style}>
             <LaneHeader setActivatorNodeRef={setActivatorNodeRef} listeners={listeners} attributes={attributes}
-                laneNo={lane.laneNo} loadData={loadData}>
-                <h5>[{lane.laneNo}] {lane.laneTitle}</h5>
+                laneNo={lane.laneNo} laneTitle={lane.laneTitle}>
             </LaneHeader>
 
             <SortableContext items={lane.cardIdList.map(cardId => cardId)} strategy={rectSortingStrategy}>
                 {lane.cardIdList.map(cardId => (
                     <Card key={cardId} id={cardId} card={cardMapInLane[cardId]} 
-                        laneNo={lane.laneNo} laneId={id}></Card>
+                        laneNo={lane.laneNo} laneId={id} boardNo={boardNo}></Card>
                 ))}
             </SortableContext>
 

@@ -3,9 +3,10 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "../css/Card.css";
+import { useKanban } from "../hooks/useKanban";
 
 export default React.memo(function Card(props) {
-    const { id, card, laneNo, laneId } = props;
+    const { id, card, laneNo, laneId, boardNo } = props;
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
@@ -28,6 +29,11 @@ export default React.memo(function Card(props) {
         // backgroundColor: createBgColor()
     };
 
+    const { deleteCard } = useKanban();
+    const handleDeleteCard = useCallback(async()=>{
+        await deleteCard(boardNo, card.cardNo);
+    },[boardNo, card]);
+
     return (<>
         <div className="kanban-card" ref={setNodeRef} style={style} 
             {...listeners} {...attributes}>
@@ -41,10 +47,26 @@ export default React.memo(function Card(props) {
                         <BsThreeDotsVertical />
                     </button>
                     <ul className="card-dropdown-menu dropdown-menu dropdown-menu-end dropdown-menu-sm-start">
-                        <li><a className="dropdown-item" href="#"><span>수정</span></a></li>
-                        <li><a className="dropdown-item" href="#"><span>색상</span></a></li>
-                        <li><a className="dropdown-item" href="#"><span>멤버</span></a></li>
-                        <li><a className="dropdown-item" href="#"><span>삭제</span></a></li>
+                        <li>
+                            <a className="dropdown-item" href="#">
+                                <span>수정</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a className="dropdown-item" href="#">
+                                <span>색상</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a className="dropdown-item" href="#">
+                                <span>멤버</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a className="dropdown-item" onClick={e=>handleDeleteCard()}>
+                                <span>삭제</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

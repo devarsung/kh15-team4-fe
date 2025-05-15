@@ -40,21 +40,27 @@ export const useKanban = () => {
         catch(e){}
     };
 
-    const selectLaneFullList = async (boardNo) => {
-        const { data } = await axios.get(`/lane/lanefull/${boardNo}`);
-        return data;
+    const updateLaneOrder = async (boardNo, orderDataList) => {
+        await axios.put(`/lane/${boardNo}/order`, orderDataList);
     };
 
-    const updateLaneOrder = async (orderDataList) => {
-        await axios.put(`/lane/order`, orderDataList);
+
+
+    /////////////////////////////////////////////////
+    const createCard = async (boardNo, laneNo, cardTitle) => {
+        await axios.post(`/card/${boardNo}/lane/${laneNo}`, {cardTitle: cardTitle});
     };
 
-    const updateCardOrder = async (orderDataList) => {
-        await axios.put(`/card/order`, orderDataList);
+    const deleteCard = async (boardNo, cardNo) => {
+        await axios.delete(`/card/${boardNo}/${cardNo}`);
     };
 
-    const updateCardOrderBetween = async (orderDataMap) => {
-        await axios.put(`/card/orderBetween`, orderDataMap);
+    const updateCardOrder = async (boardNo, orderDataList) => {
+        await axios.put(`/card/${boardNo}/order`, orderDataList);
+    };
+
+    const updateCardOrderBetween = async (boardNo, orderDataMap) => {
+        await axios.put(`/card/${boardNo}/orderBetween`, orderDataMap);
     };
 
     const moveBetweenLanes = (activeList, activeIndex, overList, overIndex, item) => {
@@ -64,10 +70,11 @@ export const useKanban = () => {
         return result;
     };
 
-    const createCard = async (laneNo, cardTitle) => {
-        await axios.post(`/card/${laneNo}`, {cardTitle: cardTitle});
-    };
+    
 
-    return { convertToMap, createLane, deleteLane, updateLaneOrder, 
-            updateCardOrder, updateCardOrderBetween, moveBetweenLanes, createCard };
+    return { 
+        convertToMap, createLane, deleteLane, updateLaneOrder, 
+        createCard, deleteCard, updateCardOrder, updateCardOrderBetween, 
+        moveBetweenLanes 
+    };
 };

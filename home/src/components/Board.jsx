@@ -55,7 +55,7 @@ export default function Board() {
         });
 
         return () => {
-            if(subIdRef.current) {
+            if (subIdRef.current) {
                 unsubscribeWebSocket(`/private/update/${boardNo}`);
                 subIdRef.current = null;
             }
@@ -72,7 +72,11 @@ export default function Board() {
         await connectWebSocket(userAccessToken);
         const destination = `/private/update/${boardNo}`;
         const callback = (result) => {
-            console.log("업데이트는");
+            const convertData = convertToMap(result);
+            //console.log("변환 후", convertData);
+            setLaneMap(() => ({ ...convertData.lanes }));
+            setCardMap(() => ({ ...convertData.cards }));
+            setLaneIdList(() => [...convertData.laneIds]);
         };
         const subId = await subscribeWebSocket(destination, callback, userAccessToken);
         subIdRef.current = subId;
@@ -111,13 +115,15 @@ export default function Board() {
                 card: cardMap[active.id],
                 laneNo: active.data.current.laneNo,
                 laneId: active.data.current.laneId,
+                boardNo: boardNo
             });
         } else if (type === "lane") {
             setActiveDragInfo({
                 type: "lane",
                 id: active.id,
                 lane: laneMap[active.id],
-                cardMapInLane: getCardMapInLane(active.id)
+                cardMapInLane: getCardMapInLane(active.id),
+                boardNo: boardNo
             });
         }
     }, [laneMap, cardMap]);
@@ -158,7 +164,7 @@ export default function Board() {
         };
 
         try {
-            updateCardOrderBetween(orderDataMap);
+            updateCardOrderBetween(boardNo, orderDataMap);
         }
         catch (e) {
             setLaneMap(prev => ({
@@ -193,7 +199,7 @@ export default function Board() {
             }));
 
             try {
-                updateLaneOrder(orderDataList);
+                updateLaneOrder(boardNo, orderDataList);
             }
             catch (e) {
                 setLaneIdList(prevLaneIdList);
@@ -230,7 +236,7 @@ export default function Board() {
         }));
 
         try {
-            updateCardOrder(orderDataList);
+            updateCardOrder(boardNo, orderDataList);
         }
         catch (e) {
             setLaneMap(prev => ({
@@ -242,7 +248,6 @@ export default function Board() {
 
     const handleCreateLane = useCallback(async () => {
         await createLane(boardNo, laneTitle);
-        await loadData(boardNo);
         setLaneTitle("");
         setLaneCreateMode(false);
     }, [boardNo, laneTitle]);
@@ -258,7 +263,7 @@ export default function Board() {
                 <SortableContext items={laneIdList} strategy={horizontalListSortingStrategy}>
                     {laneIdList.map(laneId => (
                         <Lane key={laneId} id={laneId} lane={laneMap[laneId]} cardMapInLane={getCardMapInLane(laneId)}
-                            loadData={loadData}></Lane>
+                            boardNo={boardNo}></Lane>
                     ))}
                 </SortableContext>
 

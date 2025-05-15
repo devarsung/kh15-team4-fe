@@ -4,6 +4,7 @@ import { throttle, debounce } from "lodash";
 import axios from 'axios';
 import Avatar from './Avatar';
 import { toast } from 'react-toastify';
+import "../css/Modal.css";
 
 export default function UserSearchModal(props) {
     const { isOpen, closeModal, boardNo } = props;
