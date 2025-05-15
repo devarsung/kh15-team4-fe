@@ -12,7 +12,7 @@ import "../css/Lane.css";
 
 export default React.memo(function Lane(props) {
     const { createCard } = useKanban();
-    const { id, lane, cardMapInLane, boardNo } = props;
+    const { id, lane, cardMapInLane, boardNo, palette } = props;
     const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
         id: id,
         data: {
@@ -47,7 +47,7 @@ export default React.memo(function Lane(props) {
             <SortableContext items={lane.cardIdList.map(cardId => cardId)} strategy={rectSortingStrategy}>
                 {lane.cardIdList.map(cardId => (
                     <Card key={cardId} id={cardId} card={cardMapInLane[cardId]} 
-                        laneNo={lane.laneNo} laneId={id} boardNo={boardNo}></Card>
+                        laneNo={lane.laneNo} laneId={id} boardNo={boardNo} palette={palette}></Card>
                 ))}
             </SortableContext>
 

@@ -27,10 +27,9 @@ function App() {
     <TopMenu/>
 
     <Routes>
-      <Route element={<EmptyLayout />}>
-        <Route path="/" element={<Intro />} />
-      </Route>
+      {/* <Route element={<EmptyLayout />}></Route> */}
       <Route element={<MainLayout />}>
+        <Route path="/" element={<Intro />} />
         <Route path="/login" element={<Login/>} />
         <Route path="/join" element={<Join/>} />
         <Route path="/invitation" element={<Private><Invitation/></Private>} />

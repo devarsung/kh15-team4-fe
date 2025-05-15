@@ -63,7 +63,7 @@ export default function BoardHeader(props) {
         <div className="container-fluid py-3 px-4 bg-white border-bottom">
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div className="d-flex align-items-center flex-wrap">
-                    <h3 className="mb-0 me-2 fw-semibold text-primary">{board.boardTitle}</h3>
+                    <h3 className="mb-0 me-2 fw-semibold text-dark">{board.boardTitle}</h3>
                     <button className="btn btn-sm btn-outline-secondary" title="제목 수정">
                         <BsFillPencilFill />
                     </button>
