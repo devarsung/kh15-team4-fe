@@ -55,7 +55,7 @@ export default React.memo(function Lane(props) {
             <div className="card-create-box">
                 {cardCreateMode === false ? (
                     <button className="btn btn-secondary w-100" onClick={e=>setCardCreateMode(true)}>
-                        <FaPlus className="me-2" />
+                        <FaPlus className="fs-5 me-2" />
                         <span>Add a card</span>
                     </button>
                 ) : (

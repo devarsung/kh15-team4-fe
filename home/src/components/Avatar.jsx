@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 export default function Avatar(props) {
-    const { nickname = '', size = 80, classes } = props;
+    const { 
+        nickname = '', size = 80, classes = ''} = props;
     const [initials, setInitials] = useState("");
     const [bgColor, setBgColor] = useState("");
 
