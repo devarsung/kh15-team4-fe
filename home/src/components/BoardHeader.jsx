@@ -1,13 +1,13 @@
 import axios from "axios";
 import { useCallback, useEffect, useState, useRef } from "react";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaSave } from "react-icons/fa";
 import { BsFillPencilFill, BsFillPersonPlusFill, BsThreeDotsVertical, BsFillTrash3Fill } from "react-icons/bs"
 import UserSearchModal from "./UserSearchModal";
 import { useModal } from "../hooks/useModal";
 import Avatar from "./Avatar";
 import * as bootstrap from 'bootstrap';
 import { connectWebSocket, subscribeWebSocket, unsubscribeWebSocket } from '../utils/webSocketClient.js';
-import { userAccessTokenState } from "../utils/storage.js";
+import { userAccessTokenState, userNoState } from "../utils/storage.js";
 import { useRecoilValue } from "recoil";
 
 export default function BoardHeader(props) {
@@ -15,6 +15,7 @@ export default function BoardHeader(props) {
     const [board, setBoard] = useState({});
     const [userList, setUserList] = useState([]);
     const { isOpen, openModal, closeModal } = useModal();
+    const userNo = useRecoilValue(userNoState);
     const userAccessToken = useRecoilValue(userAccessTokenState);
 
     const subIdRef = useRef(null);
@@ -59,14 +60,30 @@ export default function BoardHeader(props) {
         openModal();
     }, []);
 
+    const [editMode, setEditMode] = useState(false);
+    const [title, setTitle] = useState("");
+
     return (<>
         <div className="container-fluid py-3 px-4 bg-white border-bottom">
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <div className="d-flex align-items-center flex-wrap">
-                    <h3 className="mb-0 me-2 fw-semibold text-dark">{board.boardTitle}</h3>
-                    <button className="btn btn-sm btn-outline-secondary" title="제목 수정">
-                        <BsFillPencilFill />
-                    </button>
+                <div className="d-flex align-items-center flex-wrap flex-direction-row">
+                    {editMode ? (
+                        <input type="text" className="form-control w-auto" value={board.boardTitle} readOnly/>
+                    ) : (
+                        <h3 className="mb-0 me-2 fw-semibold text-dark">{board.boardTitle}</h3>
+                    )}
+                    {board.accountNo === userNo && (
+                        editMode ? (
+                            <button className="btn btn-sm btn-outline-secondary" title="제목 저장">
+                                <FaSave />
+                            </button>
+                        ) : (
+                            <button className="btn btn-sm btn-outline-secondary" title="제목 수정"
+                                onClick={e=>setEditMode(true)}>
+                                <BsFillPencilFill />
+                            </button>
+                        )
+                    )}
                 </div>
 
                 <div className="d-flex align-items-center gap-2 flex-wrap ms-auto">
