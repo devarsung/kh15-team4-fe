@@ -158,11 +158,11 @@ export default React.memo(function Card(props) {
                 </div>
             </div>
 
-            <div className="card-body">
-                [{card.cardNo}]{card.cardTitle}
+            <div className="card-body mt-2">
+                {card.cardTitle}
             </div>
 
-            <div className="card-footer">
+            <div className="card-footer mt-2">
                 {card.cardPic ? (
                     <Avatar nickname={card.accountNickname} size={32} classes={`avatar`}/>
                 ) : (

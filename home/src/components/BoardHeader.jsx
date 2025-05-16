@@ -61,14 +61,17 @@ export default function BoardHeader(props) {
     }, []);
 
     const [editMode, setEditMode] = useState(false);
-    const [title, setTitle] = useState("");
+    const [title, setTitle] = useState(board.boardTitle);
 
     return (<>
         <div className="container-fluid py-3 px-4 bg-white border-bottom">
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div className="d-flex align-items-center flex-wrap flex-direction-row">
                     {editMode ? (
-                        <input type="text" className="form-control w-auto" value={board.boardTitle} readOnly/>
+                        <input type="text" className="form-control w-auto" value={title} 
+                            onChange={e=>setTitle(e.target.value)}
+                            onBlur={e=>{setTitle(""); setEditMode(false);}}
+                        />
                     ) : (
                         <h3 className="mb-0 me-2 fw-semibold text-dark">{board.boardTitle}</h3>
                     )}
