@@ -30,13 +30,13 @@ export default function LaneHeader(props) {
             {editMode === false ? (
                 <span><h5>{laneTitle}</h5></span>
             ) : (<>
-                <input type="text" className="form-control w-auto" 
+                <input type="text" className="form-control w-auto" autoFocus
                     value={newTitle} onChange={e=>setNewTitle(e.target.value)} 
                     onBlur={e=>{changeLaneTitle(); setEditMode(false);setNewTitle(laneTitle);}}
                 />
-                <button type="button" className="btn btn-sm" onClick={changeLaneTitle}>
+                {/* <button type="button" className="btn btn-sm" onClick={changeLaneTitle}>
                     <FaSave/>
-                </button>
+                </button> */}
             </>)}
             <div className="dropdown">
                 <button className="btn border-0 bg-transparent text-dark btn-more dropdown-toggle p-0" type="button" data-bs-toggle="dropdown"

@@ -66,7 +66,8 @@ export default function BoardHeader(props) {
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div className="d-flex align-items-center flex-wrap flex-direction-row">
                     {editMode ? (
-                        <input type="text" className="form-control w-auto" value={title} 
+                        <input type="text" className="form-control w-auto" autoFocus
+                            value={title} 
                             onChange={e=>setTitle(e.target.value)}
                             onBlur={e=>{changeBoardTitle(); setTitle(board.boardTitle); setEditMode(false);}}
                         />
@@ -74,16 +75,10 @@ export default function BoardHeader(props) {
                         <h3 className="mb-0 me-2 fw-semibold text-dark">{board.boardTitle}</h3>
                     )}
                     {board.accountNo === userNo && (
-                        editMode ? (
-                            <button className="btn btn-sm btn-outline-secondary" title="제목 저장" onClick={changeBoardTitle}>
-                                <FaSave />
-                            </button>
-                        ) : (
-                            <button className="btn btn-sm btn-outline-secondary" title="제목 수정"
-                                onClick={e=>setEditMode(true)}>
-                                <BsFillPencilFill />
-                            </button>
-                        )
+                        <button className="btn btn-sm btn-outline-secondary" title="제목 수정"
+                            onClick={e=>setEditMode(true)}>
+                            <BsFillPencilFill />
+                        </button>
                     )}
                 </div>
 

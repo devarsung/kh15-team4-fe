@@ -58,6 +58,11 @@ export default React.memo(function Card(props) {
 
     const [editMode, setEditMode] = useState(false);
     const [newTitle, setNewTitle] = useState(card.cardTitle);
+    const handleTitleChange = useCallback(()=>{
+        if(newTitle.length <= 0) return;
+        if(newTitle === card.cardTitle) return;
+        changeCardInfo("title", newTitle);
+    },[newTitle]);
 
     return (<>
         <div className="kanban-card" ref={setNodeRef} style={style}
@@ -163,7 +168,7 @@ export default React.memo(function Card(props) {
 
             {editMode === true ? (
                 <textarea className="card-edit-input" value={newTitle} autoFocus
-                    onChange={e=>setNewTitle(e.target.value)} onBlur={e=>setEditMode(false)}/>
+                    onChange={e=>setNewTitle(e.target.value)} onBlur={e=>{handleTitleChange(); setEditMode(false);}}/>
             ) : (
                 <div className="card-body mt-2">
                     {card.cardTitle}
