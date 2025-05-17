@@ -56,6 +56,9 @@ export default React.memo(function Card(props) {
         await axios.patch(`/card/${boardNo}/${card.cardNo}`, { column: column, value: value });
     }, [boardNo, card]);
 
+    const [editMode, setEditMode] = useState(false);
+    const [newTitle, setNewTitle] = useState(card.cardTitle);
+
     return (<>
         <div className="kanban-card" ref={setNodeRef} style={style}
             {...listeners} {...attributes}>
@@ -75,7 +78,7 @@ export default React.memo(function Card(props) {
                     <ul className="card-dropdown-menu dropdown-menu dropdown-menu-end dropdown-menu-sm-start">
                         <li>
                             <a type="button" className="dropdown-item" onClick={e => {
-                                e.preventDefault(); e.stopPropagation();
+                                e.preventDefault(); e.stopPropagation(); setEditMode(true);
                             }}>
                                 <FaEdit className="me-2"/>
                                 <span>수정</span>
@@ -158,9 +161,14 @@ export default React.memo(function Card(props) {
                 </div>
             </div>
 
-            <div className="card-body mt-2">
-                {card.cardTitle}
-            </div>
+            {editMode === true ? (
+                <textarea className="card-edit-input" value={newTitle} autoFocus
+                    onChange={e=>setNewTitle(e.target.value)} onBlur={e=>setEditMode(false)}/>
+            ) : (
+                <div className="card-body mt-2">
+                    {card.cardTitle}
+                </div>
+            )}
 
             <div className="card-footer mt-2">
                 {card.cardPic ? (

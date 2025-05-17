@@ -161,3 +161,20 @@
     left: 50%;
     transform: translate(-50%, -50%);
 } */
+
+.card-edit-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    word-break: break-word;
+    padding: 0.5rem 0;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}

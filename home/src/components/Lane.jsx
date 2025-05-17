@@ -41,7 +41,7 @@ export default React.memo(function Lane(props) {
     return (<>
         <div className="kanban-lane" ref={setNodeRef} style={style}>
             <LaneHeader setActivatorNodeRef={setActivatorNodeRef} listeners={listeners} attributes={attributes}
-                laneNo={lane.laneNo} laneTitle={lane.laneTitle}>
+                laneNo={lane.laneNo} laneTitle={lane.laneTitle} boardNo={boardNo}>
             </LaneHeader>
 
             <SortableContext items={lane.cardIdList.map(cardId => cardId)} strategy={rectSortingStrategy}>

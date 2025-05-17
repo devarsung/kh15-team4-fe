@@ -50,7 +50,7 @@ export default function MyWorkSpace() {
                 <div className="row row-cols-2 row-cols-md-4 g-4">
                     {myBoardList.map(board => (
                         <div className="col" key={board.boardNo}>
-                            <button className="btn btn-outline-secondary btn-workspace fw-bold fs-5"
+                            <button className="btn btn-outline-success btn-workspace fw-bold fs-5"
                                 onClick={e => goToBoardDetail(board)}>
                                 {board.boardTitle}
                             </button>
@@ -85,7 +85,7 @@ export default function MyWorkSpace() {
                     <div className="row row-cols-2 row-cols-md-4 g-4">
                         {guestBoardList.map(board => (
                             <div className="col" key={board.boardNo}>
-                                <button className="btn btn-outline-success btn-workspace position-relative w-100" style={{ height: '100px' }} onClick={e => goToBoardDetail(board)}>
+                                <button className="btn btn-outline-info btn-workspace position-relative w-100" style={{ height: '100px' }} onClick={e => goToBoardDetail(board)}>
                                     <div className="position-absolute top-50 start-50 translate-middle fw-bold fs-5 text-center">
                                         {board.boardTitle}
                                     </div>

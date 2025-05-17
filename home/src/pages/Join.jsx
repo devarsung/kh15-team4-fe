@@ -138,15 +138,15 @@ export default function Join() {
     return (<>
 
         {/* 테스트용 */}
-        <div className="mt-3">
+        {/* <div className="mt-3">
             <button onClick={() => setStep(1)}>1</button>
             <button onClick={() => setStep(2)}>2</button>
             <button onClick={() => setStep(3)}>3</button>
-        </div>
+        </div> */}
 
         <div className="login-wrapper">
             <div className="login-box text-center">
-                <Logo textColor="text-primary" />
+                <Logo textColor="text-dark" />
 
                 <div className="row mt-3">
                     {step === 1 && (
@@ -161,7 +161,7 @@ export default function Join() {
 
                             <p className="mb-3 terms-text">가입하면 cloud 이용 약관에 동의하고 개인정보 보호정책을 인정한 것으로 간주됩니다.</p>
 
-                            <button type="submit" className="btn btn-primary w-100 mb-3"
+                            <button type="submit" className="btn btn-dark w-100 mb-3"
                                 onClick={checkEmailFormat} disabled={certSending}>
                                 {certSending === true ? <FaSpinner className="fa-spin" /> : "가입"}
                             </button>
@@ -183,7 +183,7 @@ export default function Join() {
                                 <div className="invalid-feedback text-start">인증번호가 유효하지 않습니다</div>
                             </div>
 
-                            <button type="submit" className="btn btn-primary w-100 mb-3" onClick={checkCertNumber}>확인</button>
+                            <button type="submit" className="btn btn-dark w-100 mb-3" onClick={checkCertNumber}>확인</button>
 
                             <a className="link-text" href="#" onClick={e => { e.preventDefault(); sendCertMail(true); }}>이메일을 받지 못하셨습니까? 이메일 다시 보내기</a>
                         </div>
@@ -216,7 +216,7 @@ export default function Join() {
 
                             <p className="mb-3 terms-text">가입하면 cloud 이용 약관에 동의하고 개인정보 보호정책을 인정한 것으로 간주됩니다.</p>
 
-                            <button type="submit" className="btn btn-primary w-100 mb-3" onClick={join}>확인</button>
+                            <button type="submit" className="btn btn-dark w-100 mb-3" onClick={join}>확인</button>
                         </div>
                     )}
 

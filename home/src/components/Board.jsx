@@ -25,6 +25,7 @@ export default function Board() {
     const sensors = useSensors(mouseSensor, touchSensor);
 
     const { boardNo } = useParams();
+    const [board, setBoard] = useState({});
 
     const [laneCreateMode, setLaneCreateMode] = useState(false);
     const [laneTitle, setLaneTitle] = useState("");
@@ -46,6 +47,7 @@ export default function Board() {
         canAccessBoard().then(resp => {
             if (resp === true) {
                 const init = async () => {
+                    await loadBoardInfo();
                     await loadData();
                     await updateSubscribe(boardNo);
                     setHeaderLoading(true);
@@ -75,10 +77,18 @@ export default function Board() {
         await connectWebSocket(userAccessToken);
         const destination = `/private/update/${boardNo}`;
         const callback = (result) => {
-            const convertData = convertToMap(result);
-            setLaneMap(() => ({ ...convertData.lanes }));
-            setCardMap(() => ({ ...convertData.cards }));
-            setLaneIdList(() => [...convertData.laneIds]);
+
+            if(result.type === "put") {
+                const convertData = convertToMap(result.data);
+                setLaneMap(() => ({ ...convertData.lanes }));
+                setCardMap(() => ({ ...convertData.cards }));
+                setLaneIdList(() => [...convertData.laneIds]);
+            }
+            else if(result.type === "patch") {
+                setBoard(result.data);
+            }
+
+            
         };
         const subId = await subscribeWebSocket(destination, callback, userAccessToken);
         subIdRef.current = subId;
@@ -99,6 +109,12 @@ export default function Board() {
         //멤버 정보도 불러오기
         const members = await requestMembers();
         setMemberList(members);
+    }, [boardNo]);
+
+    //보드 정보만 가져오기
+    const loadBoardInfo = useCallback(async () => {
+        const { data } = await axios.get(`/board/${boardNo}`);
+        setBoard(data);        
     }, [boardNo]);
 
     //레인,카드 데이터 비동기로 가져오기
@@ -276,7 +292,7 @@ export default function Board() {
     }, [boardNo, laneTitle]);
 
     return (<>
-        {headerLoading && (<BoardHeader boardNo={boardNo} />)}
+        {headerLoading && (<BoardHeader boardNo={boardNo} board={board}/>)}
 
         <div className="kanban-board">
             <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}

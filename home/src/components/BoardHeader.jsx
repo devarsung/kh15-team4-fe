@@ -11,8 +11,7 @@ import { userAccessTokenState, userNoState } from "../utils/storage.js";
 import { useRecoilValue } from "recoil";
 
 export default function BoardHeader(props) {
-    const boardNo = props.boardNo;
-    const [board, setBoard] = useState({});
+    const {boardNo, board} = props;
     const [userList, setUserList] = useState([]);
     const { isOpen, openModal, closeModal } = useModal();
     const userNo = useRecoilValue(userNoState);
@@ -22,7 +21,6 @@ export default function BoardHeader(props) {
 
     useEffect(() => {
         const init = async () => {
-            await loadBoardInfo();
             await usersSubscribe(boardNo);
         };
         init();
@@ -51,17 +49,17 @@ export default function BoardHeader(props) {
         subIdRef.current = subId; // 구독 ID 저장
     }, [userAccessToken]);
 
-    const loadBoardInfo = useCallback(async () => {
-        const { data } = await axios.get(`/board/${boardNo}`);
-        setBoard(data);
-    }, [boardNo]);
-
     const handleSearchModalOpen = useCallback(() => {
         openModal();
     }, []);
 
     const [editMode, setEditMode] = useState(false);
     const [title, setTitle] = useState(board.boardTitle);
+    const changeBoardTitle = useCallback(async()=>{
+        if(title.length <= 0) return;
+        if(title === board.boardTitle) return;
+        await axios.patch(`/board/title/${boardNo}`, {boardTitle: title});
+    },[boardNo, title]);
 
     return (<>
         <div className="container-fluid py-3 px-4 bg-white border-bottom">
@@ -70,14 +68,14 @@ export default function BoardHeader(props) {
                     {editMode ? (
                         <input type="text" className="form-control w-auto" value={title} 
                             onChange={e=>setTitle(e.target.value)}
-                            onBlur={e=>{setTitle(""); setEditMode(false);}}
+                            onBlur={e=>{changeBoardTitle(); setTitle(board.boardTitle); setEditMode(false);}}
                         />
                     ) : (
                         <h3 className="mb-0 me-2 fw-semibold text-dark">{board.boardTitle}</h3>
                     )}
                     {board.accountNo === userNo && (
                         editMode ? (
-                            <button className="btn btn-sm btn-outline-secondary" title="제목 저장">
+                            <button className="btn btn-sm btn-outline-secondary" title="제목 저장" onClick={changeBoardTitle}>
                                 <FaSave />
                             </button>
                         ) : (
@@ -114,11 +112,14 @@ export default function BoardHeader(props) {
                         </div>
                     </div>
 
-                    <button className="btn btn-outline-primary btn-sm d-flex align-items-center"
-                        onClick={handleSearchModalOpen}>
-                        <BsFillPersonPlusFill className="me-1" />
-                        <span>초대</span>
-                    </button>
+                    {board.accountNo === userNo && (
+                        <button className="btn btn-outline-primary btn-sm d-flex align-items-center"
+                            onClick={handleSearchModalOpen}>
+                            <BsFillPersonPlusFill className="me-1" />
+                            <span>초대</span>
+                        </button>
+                    )}
+                    
 
                     <div className="dropdown">
                         <button className="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown">

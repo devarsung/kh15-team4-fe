@@ -76,7 +76,7 @@ export default function Login() {
     return (<>
         <div className="login-wrapper">
             <div className="login-box text-center">
-                <Logo textColor="text-primary" />
+                <Logo textColor="text-dark" />
 
                 <div className="row mt-3">
                     <div className="col-12">
@@ -136,9 +136,9 @@ export default function Login() {
                         </div>
 
                         {emailPass === true ? (
-                            <button type="submit" className="btn btn-primary w-100 mb-3" onClick={handleLogin}>로그인</button>
+                            <button type="submit" className="btn btn-dark w-100 mb-3" onClick={handleLogin}>로그인</button>
                         ) : (
-                            <button type="submit" className="btn btn-primary w-100 mb-3" onClick={checkEmailFormat}>계속</button>
+                            <button type="submit" className="btn btn-dark w-100 mb-3" onClick={checkEmailFormat}>계속</button>
                         )}
 
                         <a className="link-text" href="#">로그인 할 수 없습니까?</a>
