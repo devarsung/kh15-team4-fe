@@ -80,7 +80,7 @@ export default function TopMenu() {
     return (<>
         <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
             <div className="container-fluid">
-                <Link className="navbar-brand" to="/">Navbar</Link>
+                <Link className="navbar-brand" to="/">KANBAN</Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02"
                     aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
@@ -90,23 +90,26 @@ export default function TopMenu() {
                         <li className="nav-item">
                             <Link className="nav-link" to="/">Home</Link>
                         </li>
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                             <Link to="/login" className="nav-link">
                                 <FaRightToBracket className="me-2" />
                                 <span>Login</span>
                             </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to="/myPage" className="nav-link">
-                                mypage
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to="/myWorkSpace" className="nav-link">
-                                workspace
-                            </Link>
-                        </li>
-                        <li className="nav-item">
+                        </li> */}
+                        {isLogin && (<>
+                            <li className="nav-item">
+                                <Link to="/myPage" className="nav-link">
+                                    mypage
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/myWorkSpace" className="nav-link">
+                                    workspace
+                                </Link>
+                            </li>
+                        </>)}
+                        
+                        {/* <li className="nav-item">
                             <Link className="nav-link" onClick={quickLogin}>
                                 빠른로그인
                             </Link>
@@ -115,12 +118,12 @@ export default function TopMenu() {
                             <Link className="nav-link" onClick={quickLogin2}>
                                 빠른로그인2
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#">About</a>
-                                <a className="dropdown-item" href="#">Pricing</a>
+                                <Link className="dropdown-item" onClick={quickLogin}>de</Link>
+                                <Link className="dropdown-item" onClick={quickLogin2}>mi</Link>
                                 <a className="dropdown-item" href="#">Something else here</a>
                                 <div className="dropdown-divider"></div>
                                 <a className="dropdown-item" href="#">Separated link</a>
@@ -144,8 +147,7 @@ export default function TopMenu() {
                                     <Avatar nickname={userNickname} size={40}></Avatar>
                                 </a>
                                 <div className="dropdown-menu dropdown-menu-end">
-                                    <a className="dropdown-item" href="#">{userNickname}</a>
-                                    <a className="dropdown-item" href="#">Pricing</a>
+                                    <Link to="/myPage" className="dropdown-item">{userNickname}</Link>
                                     <a className="dropdown-item" href="#" onClick={handleLogout}>Logout</a>
                                 </div>
                             </li>
