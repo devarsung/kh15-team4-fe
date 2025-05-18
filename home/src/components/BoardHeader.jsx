@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState, useRef } from "react";
-import { FaUsers, FaSave } from "react-icons/fa";
+import { FaTrashAlt, } from "react-icons/fa";
 import { BsFillPencilFill, BsFillPersonPlusFill, BsThreeDotsVertical, BsFillTrash3Fill } from "react-icons/bs"
 import UserSearchModal from "./UserSearchModal";
 import { useModal } from "../hooks/useModal";
@@ -9,8 +9,11 @@ import * as bootstrap from 'bootstrap';
 import { connectWebSocket, subscribeWebSocket, unsubscribeWebSocket } from '../utils/webSocketClient.js';
 import { userAccessTokenState, userNoState } from "../utils/storage.js";
 import { useRecoilValue } from "recoil";
+import { CiLogout } from "react-icons/ci";
+import { useNavigate } from "react-router-dom";
 
 export default function BoardHeader(props) {
+    const navigate = useNavigate();
     const { boardNo, board } = props;
     const [userList, setUserList] = useState([]);
     const { isOpen, openModal, closeModal } = useModal();
@@ -60,6 +63,16 @@ export default function BoardHeader(props) {
         if (title === board.boardTitle) return;
         await axios.patch(`/board/title/${boardNo}`, { boardTitle: title });
     }, [boardNo, title]);
+
+    const deleteBoard = useCallback(async ()=>{
+        await axios.delete(`/board/${boardNo}`);
+        navigate("/myWorkSpace");
+    },[boardNo]);
+
+    const outFromboard = useCallback(async ()=>{
+        await axios.post(`/board/${boardNo}/leave`);
+        navigate("/myWorkSpace");
+    },[boardNo]);
 
     return (<>
         <div className="container-fluid py-3 px-4 bg-white border-bottom">
@@ -125,21 +138,21 @@ export default function BoardHeader(props) {
                             <BsThreeDotsVertical />
                         </button>
                         <ul className="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a className="dropdown-item d-flex align-items-center" href="#">
-                                    <FaUsers className="me-2" />
-                                    <span>멤버 목록 보기</span>
-                                </a>
-                            </li>
-                            <li>
-                                <hr className="dropdown-divider" />
-                            </li>
-                            <li>
-                                <a className="dropdown-item d-flex align-items-center text-danger" href="#">
-                                    <BsFillTrash3Fill className="me-2" />
-                                    <span>보드 삭제</span>
-                                </a>
-                            </li>
+                            {board.accountNo === userNo ? (
+                                <li>
+                                    <a className="dropdown-item d-flex align-items-center text-danger" onClick={deleteBoard}>
+                                        <FaTrashAlt className="me-2" />
+                                        <span>보드 삭제</span>
+                                    </a>
+                                </li>
+                            ) : (
+                                <li>
+                                    <a className="dropdown-item d-flex align-items-center" onClick={outFromboard}>
+                                        <CiLogout className="me-2" />
+                                        <span>보드 나가기</span>
+                                    </a>
+                                </li>
+                            )}
                         </ul>
                     </div>
 

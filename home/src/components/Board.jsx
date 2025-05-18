@@ -87,7 +87,9 @@ export default function Board() {
             else if(result.type === "patch") {
                 setBoard(result.data);
             }
-
+            else if(result.type === "member") {
+                setMemberList(result.data);
+            }
             
         };
         const subId = await subscribeWebSocket(destination, callback, userAccessToken);
